@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 # создаем словарь, где для каждого пользователя
-# мы будем хранить его им
+# мы будем хранить его имя
 sessionStorage = {}
 
 
