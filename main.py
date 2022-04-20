@@ -77,12 +77,10 @@ def get_first_name(req):
 
 
 def yes_or_no(or_ut):
-    or_ut = natasha(or_ut)
-    global Yes
-    global No
+    or_ut = natasha(or_ut).lower()
     # Функция вернёт True, если ответ положительный
     # и вернёт False, если ответ отрицательный
-    return True if or_ut.lower() in Yes else False
+    return True if or_ut in Yes else False
 
 
 def natasha(text):
