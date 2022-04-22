@@ -71,7 +71,7 @@ def handle_dialog(res, req):
         if first_name is None:
             res['response']['text'] = 'Не расслышала имя. Повтори, пожалуйста!'
         # Если нашли, то приветствуем пользователя
-        # и спрашиваем какой город он хочет увидеть.    # # ?? Мб спрашиваем знает ли он правила?
+        # и спрашиваем знает ли он правила
         else:
             sessionStorage[user_id]['first_name'] = first_name
             res['response']['text'] = 'Приятно познакомиться, ' + first_name.title() + '. Я - Алиса. Ты знаешь правила игры?'
@@ -79,7 +79,6 @@ def handle_dialog(res, req):
     else:
         say_rules1(req, res)
         say_rules2(req, res)
-        
 
 
 def say_rules1(req, res):
@@ -92,7 +91,7 @@ def say_rules1(req, res):
 
 def say_rules2(req, res):
     if yes_or_no(req):
-        res['response']['text'] = Danetki.keys()
+        res['response']['text'] = str([e for e in Danetki.keys()])[2:-2]
     else:
         res['response']['text'] = 'Очень жаль...'
 
@@ -116,14 +115,15 @@ def yes_or_no(req):
 
 
 def natasha(text):
-    text.replace(".", "")
-    text.replace("!", "")
-    text.replace("?", "")
-    text.replace("-", "")
-    text.replace(",", "")
-    text.replace(":", "")
-    text.replace(";", "")
-    # Избавляемся от всех знаков
+    text = text.replace(".", "")
+    text = text.replace("!", "")
+    text = text.replace("?", "")
+    text = text.replace("-", "")
+    text = text.replace(",", "")
+    text = text.replace(":", "")
+    text = text.replace(";", "")
+    # Избавляемся от всех знаков во входящем
+    # тексте для дальнейшей обработки
     return text
 
 
