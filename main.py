@@ -10,15 +10,16 @@ logging.basicConfig(level=logging.INFO)
 # Создаем словарь, где для каждого пользователя
 # мы будем хранить его имя
 sessionStorage = {}
+
 Danetki = {
-    'Девушка в автобусе': ['Девушка заходит в автобус. Катя уступает ей своё место, но девушка сильно смутилась. '
-                           'Что стало причиной смущения?', 'Девочка Катя сидела на коленках у свего папы']
-}  # # Все Данетки с ответами
+    'девушка в автобусе': ['Девушка заходит в автобус. Катя уступает ей своё место, но девушка сильно смутилась.'
+                           ' Что стало причиной смущения?', 'Девочка Катя сидела на коленках у свего папы']
+}
 Yes = ["да", "а то", "а как же", "конечно", "хорошо", "ну да", "ещё бы", "точно", "вот именно",
        "легко", "ладно", "ясно", "так точно", "типа того", "разумеется", "правильно", "само собой разумеется",
        "пусть будет так", "безусловно", "ага", "отлично", "несомненно", "реально", "угу", "есть такое дело",
        "однозначно", "неужто", "железобетонно", "а то как же", "ну конечно", "дадада", "дада", "дас", "да с",
-       "йес", "поехали", "погнали", "полетели"]  # # Список положительных ответов
+       "йес", "поехали", "погнали", "полетели", "давай"]  # # Список положительных ответов
 No = ["нет", "что вы", "как можно", "что ты", "ни в коем случае", "вот ещё", "ни за что", "очень надо",
       "очень нужно", "ещё чего", "нельзя", "не тутто было", "ничего подобного", "ни фига", "ни капли", "ни хрена",
       "вовсе нет", "как бы не так", "да вы что", "я бы не сказал", "я бы не сказала", "речи быть не может",
@@ -56,7 +57,8 @@ def handle_dialog(res, req):
         res['response']['text'] = 'Привет! Назови свое имя!'
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
-            'first_name': None
+            'first_name': None,
+            'action': None
         }
         return
 
@@ -76,45 +78,36 @@ def handle_dialog(res, req):
             res['response']['text'] = 'Приятно познакомиться, ' + first_name.title() + '. Я - Алиса. Ты знаешь правила игры?'
             return
     else:
-        if sessionStorage[user_id]['kown_rules'] is None:
-            say_rules1(req, res)
-            sessionStorage[user_id]['know_rules'] = True
+        if sessionStorage[user_id]['action'] is None:
+            sessionStorage[user_id]['action'] = 'select'
+            if yes_or_no(req, res):
+                res['response']['text'] = 'Хорошо! Будем играть?'
+            else:
+                res['response']['text'] = rules + ' Давай играть?'
             return
-        else:
-            say_rules2(req, res)
+        elif sessionStorage[user_id]['action'] == 'select':
+            if yes_or_no(req, res):
+                res['response']['text'] = 'Выбери Данетку: ' + str([e for e in Danetki.keys()])[1:-1]
+                sessionStorage[user_id]['action'] = 'select_2'
+            else:
+                res['response']['text'] = 'Очень жаль...'
+            return
+        elif sessionStorage[user_id]['action'] == 'select_2':
+            sessionStorage[user_id]['action'] = select(req, res)
+            if sessionStorage[user_id]['action'] != 'select_2':
+                res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + str(Danetki[sessionStorage[user_id]['action']][0])
+                sessionStorage[user_id]['action'] = 'play'
+            return
+        #elif sessionStorage[user_id]['action'] == 'play':
 
 
-def say_rules1(req, res):
-    if yes_or_no(req):
-        res['response']['text'] = 'Хорошо! Тогда давай играть, выбери Данетку:'
-        say_rules2(req, res)
+def select(req, res):
+    txt = natasha(req['request']['original_utterance']).lower()
+    if txt in Danetki.keys():
+        return txt
     else:
-        res['response']['text'] = rules + 'Давай играть?'
-        say_rules2(req, res)
-    return
-
-
-def say_rules2(req, res):
-    if yes_or_no(req):
-        res['response']['text'] = str([e for e in Danetki.keys()])[2:-2]
-        choose_danetka(req, res)
-    else:
-        res['response']['text'] = 'Очень жаль...'
-    return
-
-
-def choose_danetka(req, res):
-    or_ut = req['request']['original_utterance']
-    Danetka_is_choosed = 1
-    for Danetka in Danetki.keys():
-        if or_ut == Danetka:
-            res['response']['text'] = "отличный выбор! Слушай: " + Danetki[Danetka][0]
-            Danetka_is_choosed = 0
-    if Danetka_is_choosed:
-        return
-    else:
-        res['response']['text'] = 'Не помню такую Данетку, точно хочешь играть?'
-        say_rules2(req, res)
+        res['response']['text'] = 'Я не знаю такую Данетку. Скажи ещё раз.'
+        return 'select_2'
 
 
 def get_first_name(req):
@@ -128,11 +121,18 @@ def get_first_name(req):
             return entity['value'].get('first_name', None)
 
 
-def yes_or_no(req):
+def yes_or_no(req, res):
     or_ut = natasha(req['request']['original_utterance']).lower()
+    for y in Yes:
+        if y in or_ut:
+            return True
+    for n in No:
+        if n in or_ut:
+            return False
+    res['response']['text'] = 'Повтори, пожалуйста. Я не поняла твой ответ. Скажи "Да" или "Нет"'
+    return
     # Функция вернёт True, если ответ положительный
     # и вернёт False, если ответ отрицательный
-    return True if or_ut in Yes else False
 
 
 def natasha(text):
@@ -143,8 +143,10 @@ def natasha(text):
     text = text.replace(",", "")
     text = text.replace(":", "")
     text = text.replace(";", "")
+    text = text.replace("ё", "е")
     # Избавляемся от всех знаков во входящем
-    # тексте для дальнейшей обработки
+    # тексте для дальнейшей обработки.
+    # Также меняем "ё" на "е"
     return text
 
 
