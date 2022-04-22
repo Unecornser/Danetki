@@ -10,11 +10,10 @@ logging.basicConfig(level=logging.INFO)
 # Создаем словарь, где для каждого пользователя
 # мы будем хранить его имя
 sessionStorage = {}
-
 Danetki = {
     'Девушка в автобусе': ['Девушка заходит в автобус. Катя уступает ей своё место, но девушка сильно смутилась. '
                            'Что стало причиной смущения?', 'Девочка Катя сидела на коленках у свего папы']
-}
+}  # # Все Данетки с ответами
 Yes = ["да", "а то", "а как же", "конечно", "хорошо", "ну да", "ещё бы", "точно", "вот именно",
        "легко", "ладно", "ясно", "так точно", "типа того", "разумеется", "правильно", "само собой разумеется",
        "пусть будет так", "безусловно", "ага", "отлично", "несомненно", "реально", "угу", "есть такое дело",
@@ -77,23 +76,45 @@ def handle_dialog(res, req):
             res['response']['text'] = 'Приятно познакомиться, ' + first_name.title() + '. Я - Алиса. Ты знаешь правила игры?'
             return
     else:
-        say_rules1(req, res)
-        say_rules2(req, res)
+        if sessionStorage[user_id]['kown_rules'] is None:
+            say_rules1(req, res)
+            sessionStorage[user_id]['know_rules'] = True
+            return
+        else:
+            say_rules2(req, res)
 
 
 def say_rules1(req, res):
     if yes_or_no(req):
         res['response']['text'] = 'Хорошо! Тогда давай играть, выбери Данетку:'
+        say_rules2(req, res)
     else:
         res['response']['text'] = rules + 'Давай играть?'
+        say_rules2(req, res)
     return
 
 
 def say_rules2(req, res):
     if yes_or_no(req):
         res['response']['text'] = str([e for e in Danetki.keys()])[2:-2]
+        choose_danetka(req, res)
     else:
         res['response']['text'] = 'Очень жаль...'
+    return
+
+
+def choose_danetka(req, res):
+    or_ut = req['request']['original_utterance']
+    Danetka_is_choosed = 1
+    for Danetka in Danetki.keys():
+        if or_ut == Danetka:
+            res['response']['text'] = "отличный выбор! Слушай: " + Danetki[Danetka][0]
+            Danetka_is_choosed = 0
+    if Danetka_is_choosed:
+        return
+    else:
+        res['response']['text'] = 'Не помню такую Данетку, точно хочешь играть?'
+        say_rules2(req, res)
 
 
 def get_first_name(req):
