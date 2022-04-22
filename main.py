@@ -58,7 +58,8 @@ def handle_dialog(res, req):
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
             'first_name': None,
-            'action': None
+            'action': False,
+            'danetka': False
         }
         return
 
@@ -80,18 +81,32 @@ def handle_dialog(res, req):
     else:
         if not sessionStorage[user_id]['action']:
             if yes_or_no(req):
-                res['response']['text'] = 'Хорошо! Тогда давай играть, выбери Данетку:'
-                sessionStorage[user_id]['action'] = 'select' # добавляем в sessionStorage action!!!
+                res['response']['text'] = 'Хорошо! Тогда давай играть, выбери Данетку:\n'
+                logging.info(str([e for e in Danetki.keys()][2:-2]))
+                res['response']['text'] += str([e for e in Danetki.keys()])[2:-2]
+                sessionStorage[user_id]['action'] = 'select'  # добавляем в sessionStorage action!!!
             else:
                 res['response']['text'] = rules + 'Давай играть?'
+                sessionStorage[user_id]['action'] = 'exit'
             return
 
-        else:
-            if yes_or_no(req):
-                res['response']['text'] = str([e for e in Danetki.keys()])[2:-2]
-            else:
-                res['response']['text'] = 'Очень жаль...'
+        if sessionStorage[user_id]['action'] == 'exit':
+            res['response']['text'] = 'До встречи'
+            res['response']['end_session'] = True
             return
+
+        if sessionStorage[user_id]['action'] == 'select':
+            if req['request']['original_utterance'] in Danetki.keys():
+                sessionStorage[user_id]['danetka'] = req['request']['original_utterance']
+                res['response']['text'] = Danetki[req['request']['original_utterance']][0]
+                return
+
+            else:
+                res['response']['text'] = 'Повторите название данетки'
+
+        if sessionStorage[user_id]['danetka']:
+            pass
+
 
 
 # def say_rules1(req, res):
