@@ -2,6 +2,7 @@ from flask import Flask, request
 import logging
 import json
 import random
+from texts import *
 
 app = Flask(__name__)
 
@@ -11,27 +12,7 @@ logging.basicConfig(level=logging.INFO)
 # мы будем хранить его имя
 sessionStorage = {}
 
-Danetki = {
-    'Девушка в автобусе': ['Девушка заходит в автобус. Катя уступает ей своё место, но девушка сильно смутилась.'
-                           ' Что стало причиной смущения?', 'Девочка Катя сидела на коленках у свего папы']
-}
-Yes = ["да", "а то", "а как же", "конечно", "хорошо", "ну да", "ещё бы", "точно", "вот именно",
-       "легко", "ладно", "ясно", "так точно", "типа того", "разумеется", "правильно", "само собой разумеется",
-       "пусть будет так", "безусловно", "ага", "отлично", "несомненно", "реально", "угу", "есть такое дело",
-       "однозначно", "неужто", "железобетонно", "а то как же", "ну конечно", "дадада", "дада", "дас", "да с",
-       "йес", "поехали", "погнали", "полетели"]  # # Список положительных ответов
-No = ["нет", "что вы", "как можно", "что ты", "ни в коем случае", "вот ещё", "ни за что", "очень надо",
-      "очень нужно", "ещё чего", "нельзя", "не тутто было", "ничего подобного", "ни фига", "ни капли", "ни хрена",
-      "вовсе нет", "как бы не так", "да вы что", "я бы не сказал", "я бы не сказала", "речи быть не может",
-      "и речи быть не может", "какое там", "кого там", "куда там", "обойдёшься", "отнюдь", "нету", "не скажи",
-      "ни в коем разе", "да нет же", "да нет", "а вот и нет", "нет как нет", "и в помине нет", "чёрта с два",
-      "ничуть", "никак нет", "ни под каким видом", "ни шиша", "и в помине нет", "и речи быть не может",
-      "ни за что на свете", "хоть убей", "не царское это дело", "ага конечно", "хрен тебе", "ни в жизнь", "шутишь",
-      "неа", "и не подумаю", "нетнет", "нетушки"]  # # Список отрицательный ответов
-rules = '«Данетки» – отличное развлечение для тех, кто любит детективы и ' \
-        'логические игры. Я расскажу тебе ситуацию, а тебе нужно отгадать ' \
-        'контекст, задавая вопросы, на которые смогу отвечать только "Да" или ' \
-        '"Нет". Если тебе понадобится помощь в угадывании ответа, скажи "Подсказка".'  # Правила игры
+
 
 
 @app.route('/', methods=['POST'])
@@ -79,8 +60,20 @@ def handle_dialog(res, req):
             res['response']['text'] = 'Приятно познакомиться, ' + first_name.title() + '. Я - Алиса. Ты знаешь правила игры?'
             return
     else:
+        if req['request']['original_utterance'].lower() in help:
+            res['response']['text'] = rules
+            return
+
+        if sessionStorage[user_id]['action'] == 'exit':
+            if not yes_or_no(req, res):
+                res['response']['text'] = 'До встречи'
+                res['response']['end_session'] = True
+                return
+            else:
+                sessionStorage[user_id]['action'] = False
+
         if not sessionStorage[user_id]['action']:
-            if yes_or_no(req):
+            if yes_or_no(req, res):
                 res['response']['text'] = 'Хорошо! Тогда давай играть, выбери Данетку:\n'
                 logging.info(str([e for e in Danetki.keys()][2:-2]))
                 res['response']['text'] += str([e for e in Danetki.keys()])[2:-2]
@@ -90,15 +83,11 @@ def handle_dialog(res, req):
                 sessionStorage[user_id]['action'] = 'exit'
             return
 
-        if sessionStorage[user_id]['action'] == 'exit':
-            res['response']['text'] = 'До встречи'
-            res['response']['end_session'] = True
-            return
-
         if sessionStorage[user_id]['action'] == 'select':
             if req['request']['original_utterance'] in Danetki.keys():
+                sessionStorage[user_id]['action'] = False
                 sessionStorage[user_id]['danetka'] = req['request']['original_utterance']
-                res['response']['text'] = Danetki[req['request']['original_utterance']][0]
+                res['response']['text'] = Danetki[req['request']['original_utterance']]['question']
                 return
 
             else:
@@ -135,12 +124,18 @@ def get_first_name(req):
             return entity['value'].get('first_name', None)
 
 
-def yes_or_no(req):
+def yes_or_no(req, res):
     or_ut = natasha(req['request']['original_utterance']).lower()
-    print(or_ut)
+    for y in Yes:
+        if y in or_ut:
+            return True
+    for n in No:
+        if n in or_ut:
+            return False
+    res['response']['text'] = 'Повтори, пожалуйста. Я не поняла твой ответ. Скажи "Да" или "Нет"'
+    return
     # Функция вернёт True, если ответ положительный
     # и вернёт False, если ответ отрицательный
-    return True if or_ut in Yes else False
 
 
 def natasha(text):
