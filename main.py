@@ -57,7 +57,8 @@ def handle_dialog(res, req):
         res['response']['text'] = 'Привет! Назови свое имя!'
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
-            'first_name': None
+            'first_name': None,
+            'action': None
         }
         return
 
@@ -77,7 +78,7 @@ def handle_dialog(res, req):
             res['response']['text'] = 'Приятно познакомиться, ' + first_name.title() + '. Я - Алиса. Ты знаешь правила игры?'
             return
     else:
-        if sessionStorage[user_id]['action'] is None:
+        if not sessionStorage[user_id]['action']:
             if yes_or_no(req):
                 res['response']['text'] = 'Хорошо! Тогда давай играть, выбери Данетку:'
                 sessionStorage[user_id]['action'] = 'select' # добавляем в sessionStorage action!!!
