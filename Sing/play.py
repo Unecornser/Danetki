@@ -9,11 +9,7 @@ def play(req, res, sessionStorage):
     elif answer == 2:
         res['response']['text'] = 'Нет'
     elif answer == 3:
-        res['response']['text'] = 'Не имеет значения'
-    elif answer == 4:
         res['response']['text'] = 'Пожалуйста, задайте другой вопрос'
-    else:
-        res['response']['text'] = 'Неизвестный вариант обработки: ' + answer
     return
 
 
@@ -25,7 +21,5 @@ def yes_or_no(req, res, sessionStorage):
         return 1
     elif or_ut in Danetki[danetka]['no']:
         return 2
-    elif or_ut in Danetki[danetka]['nothing']:
-        return 3
     else:
-        return 4
+        return 3
