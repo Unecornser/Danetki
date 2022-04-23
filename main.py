@@ -72,13 +72,18 @@ def handle_dialog(res, req):
         if first_name is None:
             res['response']['text'] = 'Не расслышала имя. Повтори, пожалуйста!'
         # Если нашли, то приветствуем пользователя
-        # и спрашиваем знает ли он правила
+        # и спрашиваем знает ли он правила.
         else:
             sessionStorage[user_id]['first_name'] = first_name
             res['response']['text'] = 'Приятно познакомиться, ' + first_name.title() + '. Я - Алиса. Ты знаешь правила игры?'
             return
     else:
         if sessionStorage[user_id]['action'] is None:
+
+            # Если поле sessionStorage[user_id]['action'] пустое,
+            # значит на данный момент пользователь либо не начал,
+            # либо только что закончил отгадывать Данетку.
+
             sessionStorage[user_id]['action'] = 'select'
             if yes_or_no(req, res):
                 res['response']['text'] = 'Хорошо! Будем играть?'
@@ -86,6 +91,11 @@ def handle_dialog(res, req):
                 res['response']['text'] = rules + ' Давай играть?'
             return
         elif sessionStorage[user_id]['action'] == 'select':
+
+            # Сценарий выбора Данетки, тут Алиса озвучивает
+            # весь перечень существующих Данеток, после чего
+            # пользователь выбирает любую из них.
+
             if yes_or_no(req, res):
                 res['response']['text'] = 'Выбери Данетку: ' + str([e for e in Danetki.keys()])[1:-1]
                 sessionStorage[user_id]['action'] = 'select_2'
@@ -93,6 +103,10 @@ def handle_dialog(res, req):
                 res['response']['text'] = 'Очень жаль...'
             return
         elif sessionStorage[user_id]['action'] == 'select_2':
+
+            # Второй блок выбора Данетки.
+            # Тут Алиса запоминает, какую Данетку выбрал пользователь.
+
             sessionStorage[user_id]['action'] = select(req, res)
             if sessionStorage[user_id]['action'] != 'select_2':
                 res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + str(Danetki[sessionStorage[user_id]['action']][0])
@@ -102,10 +116,15 @@ def handle_dialog(res, req):
 
 
 def select(req, res):
+    # Функция узнаёт и передёт в sessionStorage[user_id]['action']
+    # ту Данетку, которую выбрал пользователь.
+
     txt = natasha(req['request']['original_utterance']).lower()
     if txt in Danetki.keys():
         return txt
     else:
+        # Если пооьзователь сказал что-то невнятно либо
+        # выбрал несуществующую историю, Алиса переспросит.
         res['response']['text'] = 'Я не знаю такую Данетку. Скажи ещё раз.'
         return 'select_2'
 
