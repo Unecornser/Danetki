@@ -2,7 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f6e03d70-5d8a-44b4-ad86-29ae4369ec04" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/.idea/Mult.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/multi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mult/Описание ебучих функций.txt" beforeDir="false" afterPath="$PROJECT_DIR$/single.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sing/Natasha.py" beforeDir="false" afterPath="$PROJECT_DIR$/standart_functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sing/Описание ебучих функций .txt" beforeDir="false" afterPath="$PROJECT_DIR$/texts.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
