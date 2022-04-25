@@ -110,8 +110,8 @@ def handle_dialog(res, req):
                 play(req, res, sessionStorage)
             elif sessionStorage[user_id]['game_mode'] == 'multi_player':
                 print('-_-')
-                # res['response']['text'] = 'Отгадай эту Данетку с Друзьями! Только не показывай ответ.'
-                # res['response']['image_id'] = Danetki[sessionStorage[user_id]['game']][2]
+                # if wait_user_answer(req) == 1:
+                #     res['response']['text'] = 'Отлично! Вы молодцы. Хотите ещё Данетку?'
 
 
 def game_mode(req, res, user_id):
