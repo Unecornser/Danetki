@@ -1,3 +1,4 @@
+'''
 from main import *
 from texts import *
 
@@ -25,3 +26,4 @@ def Alice_anwer(req, sessionStorage):
         return 2
     else:
         return 3
+'''

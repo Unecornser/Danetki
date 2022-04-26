@@ -1,5 +1,21 @@
+'''
 from texts import *
-from main import natasha, sessionStorage
+from main import sessionStorage
+
+
+def natasha(text):
+    text = text.replace(".", "")
+    text = text.replace("!", "")
+    text = text.replace("?", "")
+    text = text.replace("-", "")
+    text = text.replace(",", "")
+    text = text.replace(":", "")
+    text = text.replace(";", "")
+    text = text.replace("ё", "е")
+    # Избавляемся от всех знаков во входящем
+    # тексте для дальнейшей обработки.
+    # Также меняем "ё" на "е"
+    return text
 
 
 def check_another_oper(req, res, user_id):
@@ -93,9 +109,9 @@ def repeate_Dan(res, user_id):
     return
 
 
-'''
-def what_i_know(res):
+
+# def what_i_know(res):
 
 
-def hint(Hints_array, res):
+# def hint(Hints_array, res):
 '''
