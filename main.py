@@ -38,7 +38,12 @@ def handle_dialog(res, req):
 
     # если пользователь новый, то просим его представиться.
     if req['session']['new']:
-        res['response']['text'] = 'Привет, давай поиграем в Данетки! Как тебя зовут?'
+        #res['response']['card'] = dict()
+        #res['response']['card']['type'] = 'BigImage'
+        #res['response']['card']['image_id'] = '1521359/405748b3a4611edf7437'
+        #res['response']['card']['description'] = 'Текст под карточкой'
+
+        res['response']['text'] = 'Привет, давай играть в Данетки! Как тебя зовут?'
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
             'first_name': None,
@@ -297,6 +302,8 @@ def play(req, res):
     elif answer == 2:
         res['response']['text'] = 'Нет'
     elif answer == 3:
+        pass
+    elif answer == 4:
         res['response']['text'] = 'Не имеет значения'
     return
 
@@ -310,8 +317,10 @@ def Alice_anwer(req, res):
         return 1
     elif or_ut in Danetki[danetka]['no']:
         return 2
-    elif check_another_oper(req, res, user_id):
+    elif check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку'):
         return 3
+    else:
+        return 4
 
 
 def wait_user_answer(req, res, user_id, action, text):
