@@ -4,10 +4,6 @@ from keys import *
 import logging
 import json
 import random
-# from standart_functions import *
-# from single import *
-# from multi import *
-
 
 app = Flask(__name__)
 
@@ -36,38 +32,16 @@ def main():
 def handle_dialog(res, req):
     user_id = req['session']['user_id']
 
-    # если пользователь новый, то просим его представиться.
     if req['session']['new']:
-        # res['response']['card'] = dict()
-        # res['response']['card']['type'] = 'BigImage'
-        # res['response']['card']['image_id'] = '1521359/405748b3a4611edf7437'
-        # res['response']['card']['description'] = 'Текст под карточкой'
 
-        res['response']['text'] = 'Привет, давай играть в Данетки! Как тебя зовут?'
+        res['response']['text'] = 'Привет, давай играть в Данетки! Ты знаешь правила игры?'
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
-            'first_name': None,
             'action': None,
             'game_mode': None,
             'game': None
         }
         return
-
-    # Если пользователь не новый, то попадаем сюда.
-    # Если поле имени пустое, то это говорит о том,
-    # что пользователь еще не представился.
-    if sessionStorage[user_id]['first_name'] is None:
-        # В последнем его сообщение ищем имя.
-        first_name = get_first_name(req)
-        # Если не нашли, то сообщаем пользователю, что не расслышали.
-        if first_name is None:
-            res['response']['text'] = 'Не расслышала имя. Повтори, пожалуйста!'
-        # Если нашли, то приветствуем пользователя
-        # и спрашиваем знает ли он правила.
-        else:
-            sessionStorage[user_id]['first_name'] = first_name
-            res['response']['text'] = 'Здравствуй, ' + first_name.title() + \
-                                      '! Я - Алиса. Ты знаешь правила игры?'
 
     else:
         if sessionStorage[user_id]['action'] is None:
@@ -77,16 +51,16 @@ def handle_dialog(res, req):
             # либо только что закончил отгадывать Данетку.
 
             if yes_or_no(req, res, user_id, sessionStorage[user_id]['action'], 'Ты знаешь правила игры?') is True:
-                res['response']['text'] = 'Хорошо! Выбери режим игры:\n\nИграть самому\nИграть с друзьями'
-                res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть самому или Играть с друзьями'
-                
+                res['response']['text'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
+                res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой или Играть с друзьями'
+
             elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'], 'Ты знаешь правила игры?') is False:
-                res['response']['text'] = rules_txt + '\n\n' + ' Выбери режим игры:\n\nИграть самому\nИграть с друзьями'
-                res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть самому или Играть с друзьями'
+                res['response']['text'] = rules_txt + '\n\n' + 'Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
+                res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой или Играть с друзьями'
 
             else:
                 res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
-                                              'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
+                                          'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
                 return
             sessionStorage[user_id]['action'] = 'select_mode'
 
@@ -106,7 +80,7 @@ def handle_dialog(res, req):
                     text = Danetki[sessionStorage[user_id]['game']]['question']
                     if sessionStorage[user_id]['game_mode'] == 'multi_player':
                         image = Danetki[sessionStorage[user_id]['game']]['image']
-                        description = multi_rules_txt + '\n\nА теперь Данетка\n\n' + text + '\n\n\nОтвет на фотографии\n'
+                        description = '\n\nА теперь Данетка\n\n' + text + '\n\n\nОтвет на фотографии\n'
 
                     if sessionStorage[user_id]['game_mode'] == 'multi_player':
                         res['response']['card'] = dict()
@@ -137,13 +111,13 @@ def game_mode(req, res, user_id):
     or_ut = natasha(req['request']['original_utterance']).lower()
     for single in single_player_list:
         if single in or_ut:
-            res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + ' Теперь выбери Данетку\n' + \
+            res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + ' Теперь выбери Данетку:\n' + \
                                       Dan_keys_txt
             return 'single_player'
     for multi in multi_player_list:
         if multi in or_ut:
-            res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + ' Теперь выберите Данетку\n' + \
-                                      Dan_keys_txt
+            res['response']['text'] = multi_rules_txt + '\n\n' + random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
+                                      ' Теперь выберите Данетку:\n' + Dan_keys_txt
             return 'multi_player'
     if check_another_oper(req, res, user_id, 'select_mode', game_mode_txt) is False:
         res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому'
@@ -157,9 +131,10 @@ def select(req, res, user_id):
     # ту Данетку, которую выбрал пользователь.
 
     or_ut = natasha(req['request']['original_utterance']).capitalize()
-    if or_ut in Danetki.keys():
-        res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[or_ut]['question']
-        return or_ut.capitalize()
+    for key in Danetki.keys():
+        if or_ut in key:
+            res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
+            return key
     else:
         if check_another_oper(req, res, user_id, 'select_mode', select_txt) is False:
             # Если пользователь сказал что-то невнятно, либо
@@ -193,7 +168,7 @@ def yes_or_no(req, res, user_id, action, text):
             return False
     if check_another_oper(req, res, user_id, action, text) is False:
         res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи "Да" или "Нет" или, ' \
-                              'если что-то не так, скажи "Помощь"'
+                                  'если что-то не так, скажи "Помощь"'
 
 
 def natasha(text):
