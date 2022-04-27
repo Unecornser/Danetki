@@ -41,33 +41,34 @@ def handle_dialog(res, req):
             'game_mode': None,
             'game': None
         }
+        print(req['meta']['client_id'])
+        if 'Linux' in req['meta']['client_id']:
+            sessionStorage['OS'] = 'Yandex'
+        else:
+            sessionStorage['OS'] = 'display'
         return
 
     else:
-        if sessionStorage[user_id]['action'] is None:
+        if sessionStorage['OS'] == 'Yandex':
+            if sessionStorage[user_id]['action'] is None:
 
-            # Если поле sessionStorage[user_id]['action'] пустое,
-            # значит на данный момент пользователь либо не начал,
-            # либо только что закончил отгадывать Данетку.
+                # Если поле sessionStorage[user_id]['action'] пустое,
+                # значит на данный момент пользователь либо не начал,
+                # либо только что закончил отгадывать Данетку.
 
-            if yes_or_no(req, res, user_id, sessionStorage[user_id]['action'], 'Ты знаешь правила игры?') is True:
-                res['response']['text'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
-                res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой или Играть с друзьями'
+                if yes_or_no(req, res, user_id, sessionStorage[user_id]['action'], 'Ты знаешь правила игры?') is True:
+                    res['response']['text'] = 'Хорошо! Выбери Данетку:\n' + Dan_keys_txt
 
-            elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'], 'Ты знаешь правила игры?') is False:
-                res['response']['text'] = rules_txt + '\n\n' + 'Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
-                res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой или Играть с друзьями'
+                elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
+                               'Ты знаешь правила игры?') is False:
+                    res['response']['text'] = rules_txt
+                else:
+                    res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
+                                              'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
+                    return
+                sessionStorage[user_id]['action'] = 'select'
 
-            else:
-                res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
-                                          'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
-                return
-            sessionStorage[user_id]['action'] = 'select_mode'
-
-        elif sessionStorage[user_id]['action'] == 'select_mode':  # Выбор режима игры
-            if sessionStorage[user_id]['game_mode'] is None:
-                sessionStorage[user_id]['game_mode'] = game_mode(req, res, user_id)
-            else:
+            elif sessionStorage[user_id]['action'] == 'select':
 
                 # Блок выбора Данетки.
                 # Пользователь называет выбранную Данетку
@@ -78,30 +79,73 @@ def handle_dialog(res, req):
                 else:  # Функция вернула название Данетки => продолжаем
 
                     text = Danetki[sessionStorage[user_id]['game']]['question']
-                    if sessionStorage[user_id]['game_mode'] == 'multi_player':
-                        image = Danetki[sessionStorage[user_id]['game']]['image']
-                        description = '\n\nА теперь Данетка\n\n' + text + '\n\n\nОтвет на фотографии\n'
 
-                    if sessionStorage[user_id]['game_mode'] == 'multi_player':
-                        res['response']['card'] = dict()
-                        res['response']['card']['type'] = 'BigImage'
-                        res['response']['card']['image_id'] = image
-                        res['response']['card']['description'] = description
-                    else:
-                        res['response']['text'] = text
+                    res['response']['text'] = text
                     sessionStorage[user_id]['action'] = 'play'
 
-        elif sessionStorage[user_id]['action'] == 'play':
-
-            # Начинается игра. Алиса читает условие Данетки.
-
-            if sessionStorage[user_id]['game_mode'] == 'single_player':
+            elif sessionStorage[user_id]['action'] == 'play':
+                # Начинается игра. Алиса читает условие Данетки.
                 play(req, res)
-            elif sessionStorage[user_id]['game_mode'] == 'multi_player':
-                print('Multiplayer zone')
-                if wait_user_answer(req, res, user_id, 'play', 'Продолжайте разгадывать Данетку') == 1:
-                    res['response']['text'] = 'Отлично! Вы молодцы. Хотите ещё Данетку?'
-    return
+
+        elif sessionStorage['OS'] == 'display':
+            if sessionStorage[user_id]['action'] is None:
+
+                # Если поле sessionStorage[user_id]['action'] пустое,
+                # значит на данный момент пользователь либо не начал,
+                # либо только что закончил отгадывать Данетку.
+
+                if yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?') is True:
+                    res['response']['text'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
+                    res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой или Играть с друзьями'
+
+                elif yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?') is False:
+                    res['response']['text'] = rules_txt + '\n\n' + \
+                                              'Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
+
+                else:
+                    res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
+                                              'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
+                    return
+                sessionStorage[user_id]['action'] = 'select_mode'
+
+            elif sessionStorage[user_id]['action'] == 'select_mode':  # Выбор режима игры
+                if sessionStorage[user_id]['game_mode'] is None:
+                    sessionStorage[user_id]['game_mode'] = game_mode(req, res, user_id)
+                else:
+
+                    # Блок выбора Данетки.
+                    # Пользователь называет выбранную Данетку
+
+                    sessionStorage[user_id]['game'] = select(req, res, user_id)
+                    if sessionStorage[user_id]['game'] is None:
+                        res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_txt
+                    else:  # Функция вернула название Данетки => продолжаем
+
+                        text = Danetki[sessionStorage[user_id]['game']]['question']
+                        if sessionStorage[user_id]['game_mode'] == 'multi_player':
+                            image = Danetki[sessionStorage[user_id]['game']]['image']
+                            description = text + '\n\n\nОтвет на фотографии\n'
+
+                        if sessionStorage[user_id]['game_mode'] == 'multi_player':
+                            res['response']['card'] = dict()
+                            res['response']['card']['type'] = 'BigImage'
+                            res['response']['card']['image_id'] = image
+                            res['response']['card']['description'] = description
+                        else:
+                            res['response']['text'] = text
+                        sessionStorage[user_id]['action'] = 'play'
+
+            elif sessionStorage[user_id]['action'] == 'play':
+
+                # Начинается игра. Алиса читает условие Данетки.
+
+                if sessionStorage[user_id]['game_mode'] == 'single_player':
+                    play(req, res)
+                elif sessionStorage[user_id]['game_mode'] == 'multi_player':
+                    print('Multiplayer zone')
+                    if wait_user_answer(req, res, user_id, 'play', 'Продолжайте разгадывать Данетку') == 1:
+                        res['response']['text'] = 'Отлично! Вы молодцы. Хотите ещё Данетку?'
+        return
 
 
 def game_mode(req, res, user_id):
@@ -119,7 +163,12 @@ def game_mode(req, res, user_id):
             res['response']['text'] = multi_rules_txt + '\n\n' + random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
                                       ' Теперь выберите Данетку:\n' + Dan_keys_txt
             return 'multi_player'
-    if check_another_oper(req, res, user_id, 'select_mode', game_mode_txt) is False:
+
+    if sessionStorage['OS'] == 'Yandex':
+        action = 'select'
+    else:
+        action = 'select_mode'
+    if check_another_oper(req, res, user_id, action, game_mode_txt) is False:
         res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому'
     return
     # Функция вернёт True, если ответ положительный
@@ -127,7 +176,7 @@ def game_mode(req, res, user_id):
 
 
 def select(req, res, user_id):
-    # Функция узнаёт и передаёт в sessionStorage[user_id]['action']
+    # Функция узнаёт и передаёт в sessionStorage[user_id]['game']
     # ту Данетку, которую выбрал пользователь.
 
     or_ut = natasha(req['request']['original_utterance']).capitalize()
@@ -135,13 +184,16 @@ def select(req, res, user_id):
         if or_ut in key:
             res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
             return key
+    if sessionStorage['OS'] == 'Yandex':
+        action = 'select'
     else:
-        if check_another_oper(req, res, user_id, 'select_mode', select_txt) is False:
-            # Если пользователь сказал что-то невнятно, либо
-            # выбрал несуществующую историю, Алиса переспросит.
-            res['response']['text'] = 'Я не знаю такую Данетку. Скажи ещё раз.'
-            return None
+        action = 'select_mode'
+    if check_another_oper(req, res, user_id, action, select_txt) is False:
+        # Если пользователь сказал что-то невнятно, либо
+        # выбрал несуществующую историю, Алиса переспросит.
+        res['response']['text'] = 'Я не знаю такую Данетку. Скажи ещё раз.'
         return
+    return None
 
 
 def get_first_name(req):
@@ -253,9 +305,9 @@ def use_stand_func(ret, res, user_id, action, text):
         print('Эта функция ещё не написана')
         # what_i_know()
     elif ret == 6:
-        res['response']['text'] = 'Эта функция ещё не написана'
-        print('Эта функция ещё не написана')
-        # hint()
+        # res['response']['text'] = 'Эта функция ещё не написана'
+        # print('Эта функция ещё не написана')
+        hint(res, user_id)
     elif ret == 7:
         res['response']['text'] = rules_txt
         # Алиса повторяет правила игры (читает rules_txt)
@@ -265,12 +317,16 @@ def use_stand_func(ret, res, user_id, action, text):
     return True
 
 
-'''
-def what_i_know(res):
+# def what_i_know(res):
 
 
-def hint(Hints_array, res):
-'''
+def hint(res, user_id):
+    Hints = Danetki[sessionStorage[user_id]['game']]['hints']
+    for hint in Hints:
+        if Hints[hint][1] is False:
+            Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
+            res['response']['text'] = hint
+            return
 
 
 def play(req, res):
@@ -291,15 +347,20 @@ def Alice_anwer(req, res):
     user_id = req['session']['user_id']
     or_ut = natasha(req['request']['original_utterance']).lower()
     danetka = sessionStorage[user_id]['game']
+    Hints = Danetki[sessionStorage[user_id]['game']]['hints']
 
-    if or_ut in Danetki[danetka]['yes']:
-        return 1
-    elif or_ut in Danetki[danetka]['no']:
-        return 2
-    elif check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку'):
+    for guess in Danetki[danetka]['yes']:
+        if or_ut in guess:
+            for hint in Hints:
+                if guess in hint:
+                    Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
+            return 1
+    for guess in Danetki[danetka]['no']:
+        if or_ut in guess:
+            return 2
+    if check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку') is True:
         return 3
-    else:
-        return 4
+    return 4
 
 
 def wait_user_answer(req, res, user_id, action, text):
