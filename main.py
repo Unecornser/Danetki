@@ -243,6 +243,7 @@ def natasha(text):
     text = text.replace(":", "")
     text = text.replace(";", "")
     text = text.replace("ё", "е")
+    '''
     text = text.replace("наверное", "")
     text = text.replace("я считаю что", "")
     text = text.replace("я считаю", "")
@@ -262,9 +263,25 @@ def natasha(text):
     text = text.replace("вообще", "")
     text = text.replace("была", "")
     text = text.replace("был", "")
-
+    '''
     # Избавляемся от лишнего в
     # тексте для дальнейшей обработки.
+
+    return text
+
+
+def txt_nat(text):
+    text = text.replace("наверное", "")
+    text = text.replace("я считаю что", "")
+    text = text.replace("я считаю", "")
+    text = text.replace("женщина", "девушка")
+    text = text.replace("может быть", "")
+    text = text.replace("возможно", "")
+    text = text.replace("типа", "")
+    text = text.replace("вообще", "")
+    text = text.replace("была", "")
+    text = text.replace("был", "")
+    text = text.replace("ё", "е")
 
     return text
 
@@ -385,20 +402,18 @@ def play(req, res, user_id):
 
 def Alice_anwer(req, res):
     user_id = req['session']['user_id']
-    or_ut = natasha(req['request']['command']).lower()
+    or_ut = txt_nat(req['request']['command']).lower()
     danetka = sessionStorage[user_id]['game']
     Hints = Danetki[sessionStorage[user_id]['game']]['hints']
 
-    for guess in Danetki[danetka]['yes']:
-        if or_ut == guess:
-            for hint in Hints:
-                if guess in Hints[hint][0]:
-                    Danetki[sessionStorage[user_id]['game']]['hints'][hint][2] = True
-                    Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
-            return 1
-    for guess in Danetki[danetka]['no']:
-        if or_ut == guess:
-            return 2
+    if or_ut in Danetki[danetka]['yes']:
+        for hint in Hints:
+            if or_ut in Hints[hint][0]:
+                Danetki[sessionStorage[user_id]['game']]['hints'][hint][2] = True
+                Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
+        return 1
+    if or_ut in Danetki[danetka]['no']:
+        return 2
     if or_ut in Danetki[danetka]['answers']:
         return 3
     if check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку') is True:
