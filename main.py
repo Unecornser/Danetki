@@ -156,7 +156,7 @@ def handle_dialog(res, req):
                 return
 
             elif sessionStorage[user_id]['action'] == 'end_Dan':
-                if yes_or_no(req, res, user_id, 'end_Dan')
+                # if yes_or_no(req, res, user_id, 'end_Dan')
         return
 
 
