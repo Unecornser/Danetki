@@ -244,9 +244,29 @@ def natasha(text):
     text = text.replace(":", "")
     text = text.replace(";", "")
     text = text.replace("ё", "е")
-    # Избавляемся от всех знаков во входящем
+    text = text.replace("наверное", "")
+    text = text.replace("я считаю что", "")
+    text = text.replace("я считаю", "")
+    text = text.replace("как то", "")
+    text = text.replace("что то", "")
+    text = text.replace("зачем то", "")
+    text = text.replace("почему то", "")
+    text = text.replace("вообще то", "")
+    text = text.replace("ведь", "")
+    text = text.replace("человек", "он")
+    text = text.replace("женщина", "девушка")
+    text = text.replace("может быть", "")
+    text = text.replace("возможно", "")
+    text = text.replace("косвенно", "")
+    text = text.replace("типа", "")
+    text = text.replace("типо", "")
+    text = text.replace("вообще", "")
+    text = text.replace("была", "")
+    text = text.replace("был", "")
+
+    # Избавляемся от лишнего в
     # тексте для дальнейшей обработки.
-    # Также меняем "ё" на "е"
+
     return text
 
 
@@ -348,15 +368,15 @@ def play(req, res, user_id):
     answer = Alice_anwer(req, res)
 
     if answer == 1:
-        res['response']['text'] = 'Да'
+        res['response']['text'] = random.choice(['Да', 'Верно!', 'Ага', "Угу"])
     elif answer == 2:
-        res['response']['text'] = 'Нет'
+        res['response']['text'] = random.choice(['Не', 'Неа', 'Мимо', "А вот и нет", "Нет"])
     elif answer == 3:
         single_final2(res, req, user_id)
     elif answer == 4:
         return
     elif answer == 5:
-        res['response']['text'] = 'Не имеет значения'
+        res['response']['text'] = random.choice(['Не имеет значения', 'Неважно', 'Значения не имеет'])
     if single_final1(user_id) is True:
         res['response']['text'] = 'Кажется, ты уже знаешь всё о Данетке. Попробуй сказать весь ответ полностью, ' \
                                    'если не получается - скажи: "Алиса, что я уже знаю?"'
