@@ -85,7 +85,11 @@ def handle_dialog(res, req):
 
             elif sessionStorage[user_id]['action'] == 'play':
                 # Начинается игра. Алиса читает условие Данетки.
-                play(req, res)
+                play(req, res, user_id)
+
+            elif sessionStorage[user_id]['action'] == 'final':
+                single_final2(res, req, user_id)
+                return
 
         elif sessionStorage['OS'] == 'display':
             if sessionStorage[user_id]['action'] is None:
@@ -140,11 +144,19 @@ def handle_dialog(res, req):
                 # Начинается игра. Алиса читает условие Данетки.
 
                 if sessionStorage[user_id]['game_mode'] == 'single_player':
-                    play(req, res)
+                    play(req, res, user_id)
                 elif sessionStorage[user_id]['game_mode'] == 'multi_player':
                     print('Multiplayer zone')
                     if wait_user_answer(req, res, user_id, 'play', 'Продолжайте разгадывать Данетку') == 1:
                         res['response']['text'] = 'Отлично! Вы молодцы. Хотите ещё Данетку?'
+                        sessionStorage[user_id]['action'] = 'end_Dan'
+
+            elif sessionStorage[user_id]['action'] == 'final':
+                single_final2(res, req, user_id)
+                return
+
+            elif sessionStorage[user_id]['action'] == 'end_Dan':
+                if yes_or_no(req, res, user_id, 'end_Dan')
         return
 
 
@@ -155,8 +167,8 @@ def game_mode(req, res, user_id):
     or_ut = natasha(req['request']['original_utterance']).lower()
     for single in single_player_list:
         if single in or_ut:
-            res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + ' Теперь выбери Данетку:\n' + \
-                                      Dan_keys_txt
+            res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
+                                      ' Теперь выбери Данетку:\n' + Dan_keys_txt
             return 'single_player'
     for multi in multi_player_list:
         if multi in or_ut:
@@ -327,19 +339,26 @@ def hint(res, user_id):
             Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
             res['response']['text'] = hint
             return
+    res['response']['text'] = 'Прости, подсказки закончились. Попробуй по-другому формулировать свои ' \
+                              'вопросы и у тебя всё получится'
+    return
 
 
-def play(req, res):
+def play(req, res, user_id):
     answer = Alice_anwer(req, res)
-
+    print(Danetki[sessionStorage[user_id]['game']]['hints'])
     if answer == 1:
         res['response']['text'] = 'Да'
     elif answer == 2:
         res['response']['text'] = 'Нет'
     elif answer == 3:
-        pass
+        return
     elif answer == 4:
         res['response']['text'] = 'Не имеет значения'
+    if single_final1(user_id) is True:
+        res['response']['text'] = 'Кажется, ты уже знаешь всё о Данетке. Попробуй сказать весь ответ полностью, ' \
+                                   'если не получается - скажи: "Алиса, что я уже знаю?"'
+        sessionStorage[user_id]['action'] = 'final'
     return
 
 
@@ -350,13 +369,14 @@ def Alice_anwer(req, res):
     Hints = Danetki[sessionStorage[user_id]['game']]['hints']
 
     for guess in Danetki[danetka]['yes']:
-        if or_ut in guess:
+        if or_ut == guess:
             for hint in Hints:
-                if guess in hint:
+                if guess in Hints[hint][0]:
+                    Danetki[sessionStorage[user_id]['game']]['hints'][hint][2] = True
                     Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
             return 1
     for guess in Danetki[danetka]['no']:
-        if or_ut in guess:
+        if or_ut == guess:
             return 2
     if check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку') is True:
         return 3
@@ -370,6 +390,28 @@ def wait_user_answer(req, res, user_id, action, text):
         if word in user_answer:
             return 1
     check_another_oper(req, res, user_id, action, text)
+
+
+def single_final1(user_id):
+    danetka = sessionStorage[user_id]['game']
+
+    for hint in Danetki[danetka]['hints']:
+        if Danetki[danetka]['hints'][hint][2]:
+            return True
+    return False
+
+
+def single_final2(res, req, user_id):
+    or_ut = natasha(req['request']['original_utterance']).lower()
+    Answers = Danetki[sessionStorage[user_id]['game']]['answers']
+
+    if or_ut in Answers:
+        res['response']['text'] = 'Да! Именно! Если хочешь ещё Данетку, скажи: "Алиса, я хочу другую Данетку".'
+        return
+    elif check_another_oper(req, res, user_id, 'final', 'Ты очень близко к разгадке тайны. Дай полный ответ на Данетку'):
+        return
+    res['response']['text'] = 'Нет'
+    return
 
 
 if __name__ == '__main__':
