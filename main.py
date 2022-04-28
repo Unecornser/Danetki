@@ -66,9 +66,9 @@ def handle_dialog(res, req):
                     res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
                                               'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
                     return
-                sessionStorage[user_id]['action'] = 'select'
+                sessionStorage[user_id]['action'] = 'select_mode'
 
-            elif sessionStorage[user_id]['action'] == 'select':
+            elif sessionStorage[user_id]['action'] == 'select_mode':
 
                 # Блок выбора Данетки.
                 # Пользователь называет выбранную Данетку
@@ -156,7 +156,14 @@ def handle_dialog(res, req):
                 return
 
             elif sessionStorage[user_id]['action'] == 'end_Dan':
-                if yes_or_no(req, res, user_id, 'end_Dan')
+                if yes_or_no(req, res, user_id, 'end_Dan', 'Хотите ещё Данетку?') is True:
+                    res['response']['text'] = 'Хорошо, секунду. Вы помните правила?'
+                    sessionStorage[user_id]['action'] = None
+                    sessionStorage[user_id]['game_mode'] = None
+                    sessionStorage[user_id]['game'] = None
+                else:
+                    res['response']['text'] = 'Приятно было поиграть, пока-пока'
+                    res['response']['end_session'] = True
         return
 
 
@@ -176,11 +183,7 @@ def game_mode(req, res, user_id):
                                       ' Теперь выберите Данетку:\n' + Dan_keys_txt
             return 'multi_player'
 
-    if sessionStorage['OS'] == 'Yandex':
-        action = 'select'
-    else:
-        action = 'select_mode'
-    if check_another_oper(req, res, user_id, action, game_mode_txt) is False:
+    if check_another_oper(req, res, user_id, 'select_mode', game_mode_txt) is False:
         res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому'
     return
     # Функция вернёт True, если ответ положительный
@@ -191,16 +194,13 @@ def select(req, res, user_id):
     # Функция узнаёт и передаёт в sessionStorage[user_id]['game']
     # ту Данетку, которую выбрал пользователь.
 
-    or_ut = natasha(req['request']['original_utterance']).capitalize()
+    or_ut = natasha(req['request']['original_utterance']).lower()
     for key in Danetki.keys():
-        if or_ut in key:
+        if or_ut in key.lower():
             res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
             return key
-    if sessionStorage['OS'] == 'Yandex':
-        action = 'select'
-    else:
-        action = 'select_mode'
-    if check_another_oper(req, res, user_id, action, select_txt) is False:
+
+    if check_another_oper(req, res, user_id, 'select_mode', select_txt) is False:
         # Если пользователь сказал что-то невнятно, либо
         # выбрал несуществующую историю, Алиса переспросит.
         res['response']['text'] = 'Я не знаю такую Данетку. Скажи ещё раз.'
@@ -346,14 +346,16 @@ def hint(res, user_id):
 
 def play(req, res, user_id):
     answer = Alice_anwer(req, res)
-    print(Danetki[sessionStorage[user_id]['game']]['hints'])
+
     if answer == 1:
         res['response']['text'] = 'Да'
     elif answer == 2:
         res['response']['text'] = 'Нет'
     elif answer == 3:
-        return
+        single_final2(res, req, user_id)
     elif answer == 4:
+        return
+    elif answer == 5:
         res['response']['text'] = 'Не имеет значения'
     if single_final1(user_id) is True:
         res['response']['text'] = 'Кажется, ты уже знаешь всё о Данетке. Попробуй сказать весь ответ полностью, ' \
@@ -378,9 +380,11 @@ def Alice_anwer(req, res):
     for guess in Danetki[danetka]['no']:
         if or_ut == guess:
             return 2
-    if check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку') is True:
+    if or_ut in Danetki[danetka]['answers']:
         return 3
-    return 4
+    if check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку') is True:
+        return 4
+    return 5
 
 
 def wait_user_answer(req, res, user_id, action, text):
