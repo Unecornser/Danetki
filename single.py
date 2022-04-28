@@ -7,9 +7,9 @@ def play(req, res, sessionStorage):
     answer = Alice_anwer(req, sessionStorage)
 
     if answer == 1:
-        res['response']['text'] = 'Да'
+        res['response']['text'] = random.choice(['Да', 'Верно!', 'Ага', "Угу", "Железобетонно", "Твоя правда"])
     elif answer == 2:
-        res['response']['text'] = 'Нет'
+        res['response']['text'] = random.choice(['Не', 'Неа', 'Мимо', "А вот и нет", "Нетушки", "Нет"])
     elif answer == 3:
         res['response']['text'] = 'Не имеет значения'
     return
