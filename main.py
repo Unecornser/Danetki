@@ -349,9 +349,7 @@ def use_stand_func(ret, res, user_id, action, text):
             pass
         # Алиса повторяет условие Данетки
     elif ret == 5:
-        res['response']['text'] = 'Эта функция ещё не написана'
-        print('Эта функция ещё не написана')
-        # what_i_know()
+        what_i_know(res, user_id)
     elif ret == 6:
         # res['response']['text'] = 'Эта функция ещё не написана'
         # print('Эта функция ещё не написана')
@@ -365,7 +363,16 @@ def use_stand_func(ret, res, user_id, action, text):
     return True
 
 
-# def what_i_know(res):
+def what_i_know(res, user_id):
+    danetka = sessionStorage[user_id]['game']
+
+    res['response']['text'] = 'Ты уже знаешь такие детали:\n'
+    for hint in Danetki[danetka]['hints']:
+        if Danetki[danetka]['hints'][hint][0] is False and Danetki[danetka]['hints'][hint][1] is False:
+            res['response']['text'] += hint
+    if res['response']['text'][-2] == ':':
+        res['response']['text'] = 'Пока что ты не узнал ничего особенного об этой Данетке.'
+    return
 
 
 def hint(res, user_id):
@@ -395,7 +402,7 @@ def play(req, res, user_id):
         res['response']['text'] = random.choice(['Не имеет значения', 'Неважно', 'Значения не имеет'])
     if single_final1(user_id) is True:
         res['response']['text'] = 'Кажется, ты уже знаешь всё о Данетке. Попробуй сказать весь ответ полностью, ' \
-                                   'если не получается - скажи: "Алиса, что я уже знаю?"'
+                                  'если не получается - скажи: "Алиса, что я уже знаю?"'
         sessionStorage[user_id]['action'] = 'final'
     return
 
@@ -434,9 +441,9 @@ def single_final1(user_id):
     danetka = sessionStorage[user_id]['game']
 
     for hint in Danetki[danetka]['hints']:
-        if Danetki[danetka]['hints'][hint][2]:
-            return True
-    return False
+        if Danetki[danetka]['hints'][hint][2] is False:
+            return False
+    return True
 
 
 def single_final2(res, req, user_id):
@@ -446,7 +453,8 @@ def single_final2(res, req, user_id):
     if or_ut in Answers:
         res['response']['text'] = 'Да! Именно! Если хочешь ещё Данетку, скажи: "Алиса, я хочу другую Данетку".'
         return
-    elif check_another_oper(req, res, user_id, 'final', 'Ты очень близко к разгадке тайны. Дай полный ответ на Данетку'):
+    elif check_another_oper(req, res, user_id, 'final',
+                            'Ты очень близко к разгадке тайны. Дай полный ответ на Данетку'):
         return
     res['response']['text'] = 'Нет'
     return
