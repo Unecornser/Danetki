@@ -160,9 +160,12 @@ def handle_dialog(res, req):
                     sessionStorage[user_id]['action'] = None
                     sessionStorage[user_id]['game_mode'] = None
                     sessionStorage[user_id]['game'] = None
-                else:
+                elif yes_or_no(req, res, user_id, 'end_Dan', 'Хотите ещё Данетку?') is False:
                     res['response']['text'] = 'Приятно было поиграть, пока-пока'
                     res['response']['end_session'] = True
+                else:
+                    res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
+                                              'не так, скажи "Помощь"\n\nХотите ещё Данетку?'
         return
 
 
@@ -170,7 +173,7 @@ def game_mode(req, res, user_id):
     # Функция узнаёт и передёт в sessionStorage[user_id]['game_mode']
     # режим игры (однопользовательский или многопользовательский).
 
-    or_ut = natasha(req['request']['command']).lower()
+    or_ut = req['request']['command'].lower().replace('ё', 'е')
     for single in single_player_list:
         if single in or_ut:
             res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
@@ -193,7 +196,7 @@ def select(req, res, user_id):
     # Функция узнаёт и передаёт в sessionStorage[user_id]['game']
     # ту Данетку, которую выбрал пользователь.
 
-    or_ut = natasha(req['request']['command']).lower()
+    or_ut = req['request']['command'].lower().replace('ё', 'е')
     for key in Danetki.keys():
         if or_ut in key.lower():
             res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
@@ -219,7 +222,7 @@ def get_first_name(req):
 
 
 def yes_or_no(req, res, user_id, action, text):
-    or_ut = natasha(req['request']['command']).lower()
+    or_ut = req['request']['command'].lower().replace('ё', 'е')
 
     # Функция вернёт True, если ответ положительный
     # и вернёт False, если ответ отрицательный
@@ -234,54 +237,18 @@ def yes_or_no(req, res, user_id, action, text):
                                   'если что-то не так, скажи "Помощь"'
 
 
-def natasha(text):
-    text = text.replace(".", "")
-    text = text.replace("!", "")
-    text = text.replace("?", "")
-    text = text.replace("-", "")
-    text = text.replace(",", "")
-    text = text.replace(":", "")
-    text = text.replace(";", "")
-    text = text.replace("ё", "е")
-    '''
-    text = text.replace("наверное", "")
-    text = text.replace("я считаю что", "")
-    text = text.replace("я считаю", "")
-    text = text.replace("как то", "")
-    text = text.replace("что то", "")
-    text = text.replace("зачем то", "")
-    text = text.replace("почему то", "")
-    text = text.replace("вообще то", "")
-    text = text.replace("ведь", "")
-    text = text.replace("человек", "он")
-    text = text.replace("женщина", "девушка")
-    text = text.replace("может быть", "")
-    text = text.replace("возможно", "")
-    text = text.replace("косвенно", "")
-    text = text.replace("типа", "")
-    text = text.replace("типо", "")
-    text = text.replace("вообще", "")
-    text = text.replace("была", "")
-    text = text.replace("был", "")
-    '''
-    # Избавляемся от лишнего в
-    # тексте для дальнейшей обработки.
-
-    return text
-
-
 def txt_nat(text):
     text = text.replace("наверное", "")
     text = text.replace("я считаю что", "")
     text = text.replace("я считаю", "")
-    text = text.replace("женщина", "девушка")
     text = text.replace("может быть", "")
     text = text.replace("возможно", "")
     text = text.replace("типа", "")
     text = text.replace("вообще", "")
-    text = text.replace("была", "")
-    text = text.replace("был", "")
     text = text.replace("ё", "е")
+
+    # Избавляемся от лишнего в
+    # тексте для дальнейшей обработки.
 
     return text
 
@@ -295,7 +262,7 @@ def check_another_oper(req, res, user_id, action, text):
     # Функция проверяет, вызывал ли пользователь
     # что-либо из standart_functions
 
-    or_ut = natasha(req['request']['command']).lower()
+    or_ut = req['request']['command'].lower().replace('ё', 'е')
     ret = 0
     for word in Help_list:  # Помощь
         if word in or_ut:
@@ -368,7 +335,7 @@ def what_i_know(res, user_id):
 
     res['response']['text'] = 'Ты уже знаешь такие детали:\n'
     for hint in Danetki[danetka]['hints']:
-        if Danetki[danetka]['hints'][hint][0] is False and Danetki[danetka]['hints'][hint][1] is False:
+        if Danetki[danetka]['hints'][hint][0] is True:
             res['response']['text'] += hint
     if res['response']['text'][-2] == ':':
         res['response']['text'] = 'Пока что ты не узнал ничего особенного об этой Данетке.'
@@ -391,15 +358,15 @@ def play(req, res, user_id):
     answer = Alice_anwer(req, res)
 
     if answer == 1:
-        res['response']['text'] = random.choice(['Да', 'Верно!', 'Ага', "Угу"])
+        res['response']['text'] = random.choice(['Да', 'Верно!', 'Ага', 'Угу'])
     elif answer == 2:
-        res['response']['text'] = random.choice(['Не', 'Неа', 'Мимо', "А вот и нет", "Нет"])
+        res['response']['text'] = random.choice(['Не', 'Неа', 'А вот и нет', 'Нет'])
     elif answer == 3:
         single_final2(res, req, user_id)
     elif answer == 4:
         return
     elif answer == 5:
-        res['response']['text'] = random.choice(['Не имеет значения', 'Неважно', 'Значения не имеет'])
+        res['response']['text'] = random.choice(['Не имеет значения', 'Это неважно', 'Значения не имеет'])
     if single_final1(user_id) is True:
         res['response']['text'] = 'Кажется, ты уже знаешь всё о Данетке. Попробуй сказать весь ответ полностью, ' \
                                   'если не получается - скажи: "Алиса, что я уже знаю?"'
@@ -413,23 +380,24 @@ def Alice_anwer(req, res):
     danetka = sessionStorage[user_id]['game']
     Hints = Danetki[sessionStorage[user_id]['game']]['hints']
 
-    if or_ut in Danetki[danetka]['yes']:
+    if or_ut in Danetki[danetka]['answers']:
+        return 3
+    elif or_ut in Danetki[danetka]['yes']:
         for hint in Hints:
             if or_ut in Hints[hint][0]:
                 Danetki[sessionStorage[user_id]['game']]['hints'][hint][2] = True
                 Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
         return 1
-    if or_ut in Danetki[danetka]['no']:
+    elif or_ut in Danetki[danetka]['no']:
         return 2
-    if or_ut in Danetki[danetka]['answers']:
-        return 3
-    if check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку') is True:
+    elif check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку') is True:
         return 4
-    return 5
+    else:
+        return 5
 
 
 def wait_user_answer(req, res, user_id, action, text):
-    user_answer = natasha(req['request']['command']).lower()
+    user_answer = req['request']['command'].lower().replace('ё', 'е')
 
     for word in Multi_complete_list:
         if word in user_answer:
@@ -447,7 +415,7 @@ def single_final1(user_id):
 
 
 def single_final2(res, req, user_id):
-    or_ut = natasha(req['request']['command']).lower()
+    or_ut = req['request']['command'].lower().replace('ё', 'е')
     Answers = Danetki[sessionStorage[user_id]['game']]['answers']
 
     if or_ut in Answers:
