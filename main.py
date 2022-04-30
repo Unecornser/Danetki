@@ -411,7 +411,8 @@ def single_final1(user_id):
     for hint in Danetki[danetka]['hints']:
         if Danetki[danetka]['hints'][hint][2] is False:
             return False
-    return True
+    else:
+        return True
 
 
 def single_final2(res, req, user_id):
