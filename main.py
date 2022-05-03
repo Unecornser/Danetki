@@ -39,7 +39,68 @@ def handle_dialog(res, req):
         sessionStorage[user_id] = {
             'action': None,
             'game_mode': None,
-            'game': None
+            'game': None,
+            'for_hints': {
+                'Удивительный парашютист': {
+                    'где находится самолет': [
+                        ['самолет был на земле', 'самолет стоял на земле', 'самолет уже приземлился',
+                         'самолет еще не взлетал', 'самолет приземлился', 'самолет стоял на взлетной полосе',
+                         'Самолет находился на взлетной полосе',
+                         'самолет не летел', 'самолет стоял'], False, False],
+                },
+                'Девушка в автобусе': {
+                    'возраст кати играет роль': [
+                        ['девочка ребенок', 'девочка маленькая'], False, False
+                    ],
+                    'место на котором сидит катя': [
+                        ['девочка была не на сиденье', 'девочка сидела не на сиденье', 'девочка на коленках',
+                         'катя сидела на ком то', 'катя сидела на чем то', 'катя на коленках'], False, False
+                    ],
+                    'катя с кем то': [
+                        ['девочка была с кем то из родителей', 'катя была с мужчиной', 'папа был с катей',
+                         'девочка его дочь', 'катя была с кем то из родителей', 'катя с папой', 'этот мужчина ее отец',
+                         'она с кем то'], False, False
+                    ],
+                },
+                'Фрэнк и приступ': {
+                    'какая у фрэнка работа': [
+                        ['фрэнк актер', 'фрэнк был актер', 'френк рабоатет в театре', 'фрэнк работал в театре',
+                         'его работа в театре', 'он актер', 'он был актер', 'фрэнк был актером', 'он был актером',
+                         'он артист', 'фрэнк артист'], False, False
+                    ]
+                },
+                'Загадочный человек': {
+                    'у него необычный рост': [
+                        ['это связано с ростом', 'это связано с его ростом', 'это из за роста',
+                         'из за роста', 'рост был причиной', 'он был маленький', 'он низкий',
+                         'ответ как то связан его ростом',
+                         'его рост имеет значение', 'рост этого человека имеет значение', 'это было связано с ростом',
+                         'он был ниже чем другие люди', 'он отличался ростом от других людей',
+                         'он отличался от других детей ростом', 'он был намного ниже людей своего возраста',
+                         'этот человек был намного ниже людей своего возраста', 'он карлик', 'он карликового роста',
+                         'он слишком маленький', 'он не дотягивается'], False, False
+                    ],
+                    'он не может нажать': [
+                        ['второй он нужен для кнопки 9',
+                         'когда он с кем то он едет до конца', 'у него были свои особенности', 'он был особенным',
+                         'он особенный человек', 'он особенный', 'он физически не может',
+                         'он не может нажать на кнопку',
+                         'он может поехать до своего этажа на лифте только если в нем есть кто то еще',
+                         'он может поехать до 9 этажа если едет в лифте с кемто', 'он не может нажать',
+                         'ему помогал нажать кнопку выше человек который ехал с ним в лифте',
+                         'ему помогали нажимать кнопку 9 этажа', 'ему помогали нажать на кнопку выше 7 этажа'], False,
+                        False
+                    ],
+                    'дело в самом человеке': [
+                        ['он необычный', 'это из за человека', 'это связано с человеком', 'человек связан с этим',
+                         'этому есть причина', 'этому была причина', 'он не дотягивался', 'он не мог доехать',
+                         'он не мог нажать', 'не мог доехать', 'он не может нажать кнопку 9 когда едет 1',
+                         '1 не может до 9', 'это зависит от его физических возможностей', 'у него больное тело',
+                         'у него есть деффекты', 'он был особенным', 'дело в этом человеке', 'человек необычный'],
+                        False, False
+                    ]
+                }
+            }
         }
         if 'Linux' in req['meta']['client_id']:
             sessionStorage['OS'] = 'Yandex'
@@ -331,11 +392,11 @@ def use_stand_func(ret, res, user_id, action, text):
 
 
 def what_i_know(res, user_id):
-    danetka = sessionStorage[user_id]['game']
+    Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
 
     res['response']['text'] = 'Ты уже знаешь такие детали:\n'
-    for hint in Danetki[danetka]['hints']:
-        if Danetki[danetka]['hints'][hint][0] is True:
+    for hint in Hints:
+        if Hints[hint][1] is True:
             res['response']['text'] += hint
     if res['response']['text'][-2] == ':':
         res['response']['text'] = 'Пока что ты не узнал ничего особенного об этой Данетке.'
@@ -343,10 +404,10 @@ def what_i_know(res, user_id):
 
 
 def hint(res, user_id):
-    Hints = Danetki[sessionStorage[user_id]['game']]['hints']
+    Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
     for hint in Hints:
         if Hints[hint][1] is False:
-            Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
+            sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']][hint][2] = True
             res['response']['text'] = hint
             return
     res['response']['text'] = 'Прости, подсказки закончились. Попробуй по-другому формулировать свои ' \
@@ -366,7 +427,7 @@ def play(req, res, user_id):
     elif answer == 4:
         return
     elif answer == 5:
-        res['response']['text'] = random.choice(['Не имеет значения', 'Это неважно', 'Значения не имеет'])
+        res['response']['text'] = random.choice(['Не имеет значения', 'Это неважно'])
     if single_final1(user_id) is True:
         res['response']['text'] = 'Кажется, ты уже знаешь всё о Данетке. Попробуй сказать весь ответ полностью, ' \
                                   'если не получается - скажи: "Алиса, что я уже знаю?"'
@@ -378,15 +439,15 @@ def Alice_anwer(req, res):
     user_id = req['session']['user_id']
     or_ut = txt_nat(req['request']['command']).lower()
     danetka = sessionStorage[user_id]['game']
-    Hints = Danetki[sessionStorage[user_id]['game']]['hints']
+    Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
 
     if or_ut in Danetki[danetka]['answers']:
         return 3
     elif or_ut in Danetki[danetka]['yes']:
         for hint in Hints:
             if or_ut in Hints[hint][0]:
-                Danetki[sessionStorage[user_id]['game']]['hints'][hint][2] = True
-                Danetki[sessionStorage[user_id]['game']]['hints'][hint][1] = True
+                sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']][hint][1] = True
+                sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']][hint][2] = True
         return 1
     elif or_ut in Danetki[danetka]['no']:
         return 2
@@ -402,14 +463,19 @@ def wait_user_answer(req, res, user_id, action, text):
     for word in Multi_complete_list:
         if word in user_answer:
             return 1
-    check_another_oper(req, res, user_id, action, text)
+    if check_another_oper(req, res, user_id, action, text) is True:
+        return
+    else:
+        res['response']['text'] = 'Прости, я не поняла твой ответ. Скажите, когда вы разгадаете ' \
+                                  'Данетку или, если что-то не так, скажите "Помощь"'
+        return
 
 
 def single_final1(user_id):
-    danetka = sessionStorage[user_id]['game']
+    Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
 
-    for hint in Danetki[danetka]['hints']:
-        if Danetki[danetka]['hints'][hint][2] is False:
+    for hint in Hints:
+        if Hints[hint][2] is False:
             return False
     else:
         return True
