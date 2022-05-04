@@ -506,7 +506,9 @@ def Alice_anwer(req, res):
     or_ut = txt_nat(req['request']['command']).lower()
     danetka = sessionStorage[user_id]['game']
     Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
-
+    or_ut = or_ut.split()
+    or_ut.sort()
+    or_ut = ' '.join(or_ut)
     if or_ut in Danetki[danetka]['answers']:
         return 3
     elif or_ut in Danetki[danetka]['yes']:
