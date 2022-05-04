@@ -300,7 +300,7 @@ def game_mode(req, res, user_id):
     # Функция узнаёт и передёт в sessionStorage[user_id]['game_mode']
     # режим игры (однопользовательский или многопользовательский).
 
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    or_ut = req['request']['original_utterance'].lower().replace('ё', 'е')
     for single in single_player_list:
         if single in or_ut:
             res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
@@ -323,7 +323,7 @@ def select(req, res, user_id):
     # Функция узнаёт и передаёт в sessionStorage[user_id]['game']
     # ту Данетку, которую выбрал пользователь.
 
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    or_ut = req['request']['original_utterance'].lower().replace('ё', 'е')
     for key in Danetki.keys():
         if or_ut in key.lower():
             res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
@@ -349,7 +349,7 @@ def get_first_name(req):
 
 
 def yes_or_no(req, res, user_id, action, text):
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    or_ut = req['request']['original_utterance'].lower().replace('ё', 'е')
 
     # Функция вернёт True, если ответ положительный
     # и вернёт False, если ответ отрицательный
@@ -389,7 +389,7 @@ def check_another_oper(req, res, user_id, action, text):
     # Функция проверяет, вызывал ли пользователь
     # что-либо из standart_functions
 
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    or_ut = req['request']['original_utterance'].lower().replace('ё', 'е')
     ret = 0
     for word in Help_list:  # Помощь
         if word in or_ut:
@@ -503,12 +503,10 @@ def play(req, res, user_id):
 
 def Alice_anwer(req, res):
     user_id = req['session']['user_id']
-    or_ut = txt_nat(req['request']['command']).lower()
     danetka = sessionStorage[user_id]['game']
     Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
-    or_ut = or_ut.split()
-    or_ut.sort()
-    or_ut = ' '.join(or_ut)
+    or_ut = ' '.join(txt_nat(req['request']['original_utterance']).lower().split().sort())
+
     if or_ut in Danetki[danetka]['answers']:
         return 3
     elif or_ut in Danetki[danetka]['yes']:
@@ -526,7 +524,7 @@ def Alice_anwer(req, res):
 
 
 def wait_user_answer(req, res, user_id, action, text):
-    user_answer = req['request']['command'].lower().replace('ё', 'е')
+    user_answer = req['request']['original_utterance'].lower().replace('ё', 'е')
 
     for word in Multi_complete_list:
         if word in user_answer:
@@ -550,7 +548,7 @@ def single_final1(user_id):
 
 
 def single_final2(res, req, user_id):
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    or_ut = req['request']['original_utterance'].lower().replace('ё', 'е')
     Answers = Danetki[sessionStorage[user_id]['game']]['answers']
 
     if or_ut in Answers:
