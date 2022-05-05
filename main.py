@@ -187,10 +187,10 @@ def handle_dialog(res, req):
 
                 elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
                                'Ты знаешь правила игры?') is False:
-                    res['response']['text'] = rules_txt
+                    res['response']['text'] = rules_txt + 'Теперь выбери Данету:\n' + Dan_keys_txt
                 else:
-                    res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
-                                              'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
+                    res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому"' \
+                                              '\n\nТы знаешь правила игры?'
                     return
                 sessionStorage[user_id]['action'] = 'select_mode'
 
@@ -505,7 +505,7 @@ def Alice_anwer(req, res):
     user_id = req['session']['user_id']
     danetka = sessionStorage[user_id]['game']
     Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
-    or_ut = ' '.join(txt_nat(req['request']['original_utterance']).lower().split().sort())
+    or_ut = ' '.join(sorted(txt_nat(req['request']['original_utterance']).lower().split()))
 
     if or_ut in Danetki[danetka]['answers']:
         return 3
