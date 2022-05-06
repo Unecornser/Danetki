@@ -187,7 +187,11 @@ def handle_dialog(res, req):
 
                 elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
                                'Ты знаешь правила игры?') is False:
+
                     res['response']['text'] = rules_txt + 'Теперь выбери Данету:\n' + Dan_keys_txt
+                elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'], 'Ты знаешь правила игры?') == 'ya':
+                    return
+
                 else:
                     res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому"' \
                                               '\n\nТы знаешь правила игры?'
@@ -232,6 +236,9 @@ def handle_dialog(res, req):
                     res['response']['text'] = rules_txt + '\n\n' + \
                                               'Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
 
+                elif yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?') == 'ya':
+                    return
+
                 else:
                     res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
                                               'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
@@ -249,6 +256,8 @@ def handle_dialog(res, req):
                     sessionStorage[user_id]['game'] = select(req, res, user_id)
                     if sessionStorage[user_id]['game'] is None:
                         res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_txt
+                    elif select(req, res, user_id) == 'ya':
+                        return
                     else:  # Функция вернула название Данетки => продолжаем
 
                         text = Danetki[sessionStorage[user_id]['game']]['question']
@@ -329,11 +338,8 @@ def select(req, res, user_id):
             res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
             return key
 
-    if check_another_oper(req, res, user_id, 'select_mode', select_txt) is False:
-        # Если пользователь сказал что-то невнятно, либо
-        # выбрал несуществующую историю, Алиса переспросит.
-        res['response']['text'] = 'Я не знаю такую Данетку. Скажи ещё раз.'
-        return
+    if check_another_oper(req, res, user_id, 'select_mode', select_txt) is True:
+        return 'ya'
     return None
 
 
@@ -362,6 +368,9 @@ def yes_or_no(req, res, user_id, action, text):
     if check_another_oper(req, res, user_id, action, text) is False:
         res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи "Да" или "Нет" или, ' \
                                   'если что-то не так, скажи "Помощь"'
+        return
+    elif check_another_oper(req, res, user_id, action, text) is True:
+        return 'ya'
 
 
 def txt_nat(text):
@@ -403,7 +412,7 @@ def check_another_oper(req, res, user_id, action, text):
     for word in Repeate_list:  # Повторить Данетку
         if word in or_ut:
             ret = 4
-    for word in Wt_i_kn_list:  # повтор вопросов пользователя с ответом "да"
+    for word in Wt_i_kn_list:  # Повтор вопросов пользователя с ответом "да"
         if word in or_ut:
             ret = 5
     for word in Hint_list:  # Подсказка
@@ -412,7 +421,7 @@ def check_another_oper(req, res, user_id, action, text):
     for word in Rules_list:  # Правила
         if word in or_ut:
             ret = 7
-    for word in Continue_list:  # Правила
+    for word in Continue_list:  # Продолжить играть
         if word in or_ut:
             ret = 8
     return use_stand_func(ret, res, user_id, action, text)
