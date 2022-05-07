@@ -36,6 +36,7 @@ def handle_dialog(res, req):
 
         res['response']['text'] = 'Привет, давай играть в Данетки! Это увлекательная игра, где тебе нужно угадывать ' \
                                   'предистории, которым последовала необычная ситуация. Ты знаешь правила игры?'
+
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
             'action': None,
@@ -54,13 +55,11 @@ def handle_dialog(res, req):
                         ['девочка ребенок', 'девочка маленькая', 'катя ребенок', 'катя очень маленькая',
                          'катя была ребенок', 'она была ребенком', 'катя была ребенком'], False, False
                     ],
-                    'место на котором сидит катя': [
-                        ['девочка на коленках', 'катя на коленках', 'катя сидела у кого то на коленях',
-                         'колени это место''она сидела у кого то на коленях', ], False, False
-                    ],
                     'проблема в месте': [
                         ['девочка была не на сиденье', 'девочка сидела не на сиденье', 'катя сидела на ком то',
-                         'катя сидела на чем то', 'девочка сидела на чем то', 'под катей что то было'], False, False
+                         'катя сидела на чем то', 'девочка сидела на чем то', 'под катей что то было',
+                         'девочка на коленках', 'катя на коленках', 'катя сидела у кого то на коленях',
+                         'колени это место', 'она сидела у кого то на коленях', ], False, False
                     ],
                     'катя с кем то': [
                         ['девочка была с кем то из родителей', 'катя была с мужчиной', 'папа был с катей',
@@ -118,7 +117,8 @@ def handle_dialog(res, req):
                          'на именно 3 месяца необходимо обращать внимание', 'важно ли что именно 3 месяца',
                          '3 месяца это какое то время года', '3 месяца связаны с временами года', '3 месяца это важно',
                          '3 месяца  это определённый период', '3 месяца это зима', 'именно 3 месяца это важно'
-                         'на 3 месяца необходимо обращать внимание', 'важно что именно 3 месяца',
+                                                                                   'на 3 месяца необходимо обращать внимание',
+                         'важно что именно 3 месяца',
                          'на 3 месяца нужно обращать вниманиена именно 3 месяца нужно обращать внимание',
                          '3 месяца это одно время года3 месяца это время года', '3 месяца связанны свременем года',
                          'именно 3 месяца важно', 'важно ли то что он умер через 3 месяца'},
@@ -128,7 +128,8 @@ def handle_dialog(res, req):
                         {'он неживой', 'это предмет неживой', 'оно неодушевленное', 'это неодушевленное',
                          'этот предмет неодушевленный', 'он неодушевленный', 'это неживое',
                          'это предмет не живое существо', 'это неживой'
-                         'оно неживое', 'оно не живое существо', 'это неживое существо', 'он неживое сущесnво'},
+                                                          'оно неживое', 'оно не живое существо',
+                         'это неживое существо', 'он неживое сущесnво'},
                         False, False
                     ],
                     'он умер весной': [
@@ -145,7 +146,8 @@ def handle_dialog(res, req):
                          'это бывает только зимой', 'он существует только зимой', 'эта ситуация бывает только зимой',
                          'он только зимой', 'этот предмет только зимой', 'он может быть только в зиму',
                          'это только зимняя ситуация', 'оно может быть только в зиму', 'это бывает только в зиму',
-                         'это предмет бывает только в зиму', 'он может быть только зимой', 'это существует только зимой',
+                         'это предмет бывает только в зиму', 'он может быть только зимой',
+                         'это существует только зимой',
                          'это может быть только зимой', 'оно существует только зимой', 'эта ситуация только зимой',
                          'эта ситуация может быть только в зиму', 'оно бывает только зимой', 'это только зимой',
                          'это может быть только в зиму', 'оно только зимой', 'оно бывает только в зиму',
@@ -162,14 +164,14 @@ def handle_dialog(res, req):
                          'он снежный', 'он связан с снегом', 'он что то  связанное с снегом', 'это сделанное из снега',
                          'это связано с снегом', 'оно сделано из снега', 'он из снега сделан',
                          'этот предмет что то из снега', 'оно сделанное из снега', 'оно снежное', 'он сделан из снега',
-                         'он сделан из снега',  'это предмет что то из снега', 'из снега', 'оно из снега',
+                         'он сделан из снега', 'это предмет что то из снега', 'из снега', 'оно из снега',
                          'это сделано из снега', 'оно что то сделанное из снега', 'оно связано с снегом'},
-                    False, False
+                        False, False
                     ]
                 }
             }
         }
-        if 'Linux' in req['meta']['client_id']:
+        if 'Yandex' in req['meta']['client_id']:
             sessionStorage['OS'] = 'Yandex'
         else:
             sessionStorage['OS'] = 'display'
@@ -190,7 +192,7 @@ def handle_dialog(res, req):
                 elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
                                'Ты знаешь правила игры?', hello_txt) is False:
 
-                    res['response']['text'] = rules_txt + 'Теперь выбери Данету:\n' + Dan_keys_txt
+                    res['response']['text'] = rules_txt + ' Теперь выбери Данетку:\n' + Dan_keys_txt
                 elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
                                'Ты знаешь правила игры?', hello_txt) == 'ya':
                     return
@@ -207,7 +209,9 @@ def handle_dialog(res, req):
                 # Пользователь называет выбранную Данетку
 
                 sessionStorage[user_id]['game'] = select(req, res, user_id)
-                if sessionStorage[user_id]['game'] is None:
+                if sessionStorage[user_id]['game'] == 'ya':
+                    return
+                elif sessionStorage[user_id]['game'] is None:
                     res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_txt
                 else:  # Функция вернула название Данетки => продолжаем
 
@@ -220,10 +224,6 @@ def handle_dialog(res, req):
                 # Начинается игра. Алиса читает условие Данетки.
                 play(req, res, user_id)
 
-            elif sessionStorage[user_id]['action'] == 'final':
-                single_final2(res, req, user_id)
-                return
-
         elif sessionStorage['OS'] == 'display':
             if sessionStorage[user_id]['action'] is None:
 
@@ -233,7 +233,7 @@ def handle_dialog(res, req):
 
                 if yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?', hello_txt) is True:
                     res['response']['text'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой\nИграть с друзьями'
-                    res['response']['tts'] = 'Хорошо! Выбери режим игры:\n\nИграть с Алисой или Играть с друзьями'
+                    res['response']['tts'] = 'Хорошо! Выбери режим игры: Играть с Алисой или Играть с друзьями'
 
                 elif yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?', hello_txt) is False:
                     res['response']['text'] = rules_txt + '\n\n' + \
@@ -257,16 +257,17 @@ def handle_dialog(res, req):
                     # Пользователь называет выбранную Данетку
 
                     sessionStorage[user_id]['game'] = select(req, res, user_id)
-                    if sessionStorage[user_id]['game'] is None:
-                        res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_txt
-                    elif select(req, res, user_id) == 'ya':
+                    if sessionStorage[user_id]['game'] == 'ya':
+                        sessionStorage[user_id]['game'] = None
                         return
+                    elif sessionStorage[user_id]['game'] is None:
+                        res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_txt
                     else:  # Функция вернула название Данетки => продолжаем
 
                         text = Danetki[sessionStorage[user_id]['game']]['question']
                         if sessionStorage[user_id]['game_mode'] == 'multi_player':
                             image = Danetki[sessionStorage[user_id]['game']]['image']
-                            description = text + '\n\n\nОтвет на фотографии\n'
+                            description = text + '\n\nОтвет на фотографии\n'
 
                         if sessionStorage[user_id]['game_mode'] == 'multi_player':
                             res['response']['card'] = dict()
@@ -284,14 +285,11 @@ def handle_dialog(res, req):
                 if sessionStorage[user_id]['game_mode'] == 'single_player':
                     play(req, res, user_id)
                 elif sessionStorage[user_id]['game_mode'] == 'multi_player':
-                    print('Multiplayer zone')
                     if wait_user_answer(req, res, user_id, 'play', 'Продолжайте разгадывать Данетку') == 1:
                         res['response']['text'] = 'Отлично! Вы молодцы. Хотите ещё Данетку?'
+                        res['response']['tts'] = '<speaker audio="alice-sounds-game-win-3.opus">' + \
+                                                 'Отлично! Вы молодцы. Хотите ещё Данетку?'
                         sessionStorage[user_id]['action'] = 'end_Dan'
-
-            elif sessionStorage[user_id]['action'] == 'final':
-                single_final2(res, req, user_id)
-                return
 
             elif sessionStorage[user_id]['action'] == 'end_Dan':
                 if yes_or_no(req, res, user_id, 'end_Dan', 'Хотите ещё Данетку?', '') is True:
@@ -476,8 +474,8 @@ def what_i_know(res, user_id):
 
     res['response']['text'] = 'Ты уже знаешь такие детали:\n'
     for hint in Hints:
-        if Hints[hint][1] is True:
-            res['response']['text'] += hint
+        if Hints[hint][2] is True:
+            res['response']['text'] += hint + '\n'
     if res['response']['text'][-2] == ':':
         res['response']['text'] = 'Пока что ты не узнал ничего особенного об этой Данетке.'
     return
@@ -488,7 +486,7 @@ def hint(res, user_id):
         Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
         for hint in Hints:
             if Hints[hint][1] is False:
-                sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']][hint][2] = True
+                sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']][hint][1] = True
                 res['response']['text'] = hint
                 return
         res['response']['text'] = 'Прости, подсказки закончились. Попробуй по-другому формулировать свои ' \
@@ -507,15 +505,16 @@ def play(req, res, user_id):
     elif answer == 2:
         res['response']['text'] = random.choice(['Не', 'Неа', 'А вот и нет', 'Нет'])
     elif answer == 3:
-        single_final2(res, req, user_id)
+        res['response']['text'] = 'Да! Именно! Если хочешь ещё Данетку, скажи: "Алиса, я хочу другую Данетку".'
+        res['response']['tts'] = '<speaker audio="alice-sounds-game-win-3.opus">' + \
+                                 'Да! Именно! Если хочешь ещё Данетку, скажи: "Алиса, я хочу другую Данетку".'
     elif answer == 4:
         return
     elif answer == 5:
         res['response']['text'] = random.choice(['Не имеет значения', 'Это неважно'])
-    if single_final1(user_id) is True:
+    if single_final(user_id) is True:
         res['response']['text'] = 'Кажется, ты уже знаешь всё о Данетке. Попробуй сказать весь ответ полностью, ' \
                                   'если не получается - скажи: "Алиса, что я уже знаю?"'
-        sessionStorage[user_id]['action'] = 'final'
     return
 
 
@@ -555,28 +554,14 @@ def wait_user_answer(req, res, user_id, action, text):
         return
 
 
-def single_final1(user_id):
+def single_final(user_id):
     Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
 
     for hint in Hints:
-        if Hints[hint][1] is False:
+        if Hints[hint][2] is False:
             return False
     else:
         return True
-
-
-def single_final2(res, req, user_id):
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
-    Answers = Danetki[sessionStorage[user_id]['game']]['answers']
-
-    if or_ut in Answers:
-        res['response']['text'] = 'Да! Именно! Если хочешь ещё Данетку, скажи: "Алиса, я хочу другую Данетку".'
-        return
-    elif check_another_oper(req, res, user_id, 'final',
-                            'Ты очень близко к разгадке тайны. Дай полный ответ на Данетку', ''):
-        return
-    res['response']['text'] = 'Нет'
-    return
 
 
 if __name__ == '__main__':
