@@ -218,6 +218,7 @@ def handle_dialog(res, req):
                     text = Danetki[sessionStorage[user_id]['game']]['question']
 
                     res['response']['text'] = text
+                    res['response']['tts'] = Danetki[sessionStorage[user_id]['game']]['sound'] + text
                     sessionStorage[user_id]['action'] = 'play'
 
             elif sessionStorage[user_id]['action'] == 'play':
@@ -274,8 +275,11 @@ def handle_dialog(res, req):
                             res['response']['card']['type'] = 'BigImage'
                             res['response']['card']['image_id'] = image
                             res['response']['card']['description'] = description
+                            res['response']['tts'] = Danetki[sessionStorage[user_id]['game']]['sound'] + description
                         else:
                             res['response']['text'] = text
+                            res['response']['tts'] = Danetki[sessionStorage[user_id]['game']]['sound'] + text
+
                         sessionStorage[user_id]['action'] = 'play'
 
             elif sessionStorage[user_id]['action'] == 'play':
@@ -339,6 +343,8 @@ def select(req, res, user_id):
     for key in Danetki.keys():
         if or_ut in key.lower():
             res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
+            res['response']['tts'] = Danetki[key]['sound'] + random.choice(['Отлично! ', 'Хороший выбор! ']) + \
+                                     Danetki[key]['question']
             return key
 
     if check_another_oper(req, res, user_id, 'select_mode', select_txt, select_txt) is True:
@@ -501,9 +507,9 @@ def play(req, res, user_id):
     answer = Alice_anwer(req, res)
 
     if answer == 1:
-        res['response']['text'] = random.choice(['Да', 'Верно!', 'Ага', 'Угу'])
+        res['response']['text'] = random.choice(['Да', 'Верно!', 'Ага', 'Угу', 'Так точно!', 'Ты на верном пути', 'Прекасно!'])
     elif answer == 2:
-        res['response']['text'] = random.choice(['Не', 'Неа', 'А вот и нет', 'Нет'])
+        res['response']['text'] = random.choice(['А вот и нет', 'Нет', 'Нет, не то', 'Увы, нет', 'К сожалению, нет'])
     elif answer == 3:
         res['response']['text'] = 'Да! Именно! Если хочешь ещё Данетку, скажи: "Алиса, я хочу другую Данетку".'
         res['response']['tts'] = '<speaker audio="alice-sounds-game-win-3.opus">' + \
@@ -523,16 +529,20 @@ def Alice_anwer(req, res):
     danetka = sessionStorage[user_id]['game']
     Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
     or_ut = ' '.join(sorted(txt_nat(req['request']['command']).lower().split()))
-
+    if 'не' in or_ut:
+        or_ut_ne = txt_nat(or_ut.replace(' не ', ' ')).lower()
+        or_ut_ne = or_ut_ne.replace('не ', '')
+    else:
+        or_ut_ne = txt_nat(sorted((or_ut + ' не').split())).lower()
     if or_ut in Danetki[danetka]['answers']:
         return 3
-    elif or_ut in Danetki[danetka]['yes']:
+    elif or_ut in Danetki[danetka]['yes'] or or_ut_ne in Danetki[danetka]['no']:
         for hint in Hints:
             if or_ut in Hints[hint][0]:
                 sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']][hint][1] = True
                 sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']][hint][2] = True
         return 1
-    elif or_ut in Danetki[danetka]['no']:
+    elif or_ut in Danetki[danetka]['no'] or or_ut_ne in Danetki[danetka]['yes']:
         return 2
     elif check_another_oper(req, res, user_id, 'play', 'Отлично, продолжай разгадывать Данетку', '') is True:
         return 4
