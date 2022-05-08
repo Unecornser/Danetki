@@ -521,7 +521,7 @@ def handle_dialog(res, req):
                         return
                     elif sessionStorage[user_id]['game'] is None:
                         res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + \
-                                                  (Dan_keys_single_txt if sessionStorage[user_id]['game_mode'] == 'single' else Dan_keys_multi_txt)
+                                                  (Dan_keys_single_txt if sessionStorage[user_id]['game_mode'] == 'single_player' else Dan_keys_multi_txt)
                     else:  # Функция вернула название Данетки => продолжаем
 
                         text = Danetki[sessionStorage[user_id]['game']]['question']
@@ -606,7 +606,7 @@ def select(req, res, user_id):
                                      Danetki[key]['question']
             return key
 
-    select_txt = Dan_keys_single_txt if sessionStorage[user_id]['game_mode'] == 'single' else Dan_keys_multi_txt
+    select_txt = Dan_keys_single_txt if sessionStorage[user_id]['game_mode'] == 'single_player' else Dan_keys_multi_txt
     if check_another_oper(req, res, user_id, 'select_mode', select_txt, select_txt) is True:
         return 'ya'
     return None
