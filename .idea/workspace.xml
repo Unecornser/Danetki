@@ -137,14 +137,15 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main.py</url>
-          <line>781</line>
-          <option name="timeStamp" value="35" />
+          <line>783</line>
+          <option name="timeStamp" value="39" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="or_ut" language="Python" />
+        <watch expression="Hints[hint][0]" language="Python" />
       </configuration>
     </watches-manager>
   </component>
