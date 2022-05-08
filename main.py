@@ -79,7 +79,7 @@ def handle_dialog(res, req):
                          'был возраста людей намного ниже своего человек этот', 'карлик он', 'карликового он роста',
                          'маленький он слишком', 'дотягивается не он'], False, False
                     ],
-                    'он не может нажать': [
+                    'он не может нажать кнопку': [
                         ['9 второй для кнопки нужен он', 'до едет кем когда конца он он с то',
                          'были него особенности свои у', 'был он особенным', 'он особенный человек', 'он особенный',
                          'может не он физически', 'кнопку может на нажать не он',
@@ -306,7 +306,7 @@ def game_mode(req, res, user_id):
     for single in single_player_list:
         if single in or_ut:
             res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
-                                      ' Теперь выбери Данетку:\n' + Dan_keys_txt
+                                      ' теперь выбери Данетку:\n' + Dan_keys_txt
             return 'single_player'
     for multi in multi_player_list:
         if multi in or_ut:
@@ -369,12 +369,18 @@ def yes_or_no(req, res, user_id, action, text, repeate_txt):
 
 
 def txt_nat(text):
-    text = text.replace("наверное", "")
+    text = text.replace(",", "")
+    text = text.replace("я знаю что", "")
+    text = text.replace("я придумал,", "")
+    text = text.replace("я думаю, что", "")
+    text = text.replace("мне кажется что", "")
+    text = text.replace("друг сказал что", "")
+    text = text.replace("мне подсказали что", "")
     text = text.replace("я считаю что", "")
     text = text.replace("я считаю", "")
     text = text.replace("может быть", "")
-    text = text.replace("возможно", "")
-    text = text.replace("типа", "")
+    text = text.replace(" возможно ", "")
+    text = text.replace(" типа ", "")
     text = text.replace("вообще", "")
     text = text.replace("ё", "е")
 
@@ -515,7 +521,7 @@ def Alice_anwer(req, res):
     danetka = sessionStorage[user_id]['game']
     Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
     or_ut = ' '.join(sorted(txt_nat(req['request']['command']).lower().split()))
-    if 'не' in or_ut:
+    if ' не ' in or_ut:
         or_ut_ne = txt_nat(or_ut.replace(' не ', ' ')).lower()
         or_ut_ne = or_ut_ne.replace('не ', '')
     else:
