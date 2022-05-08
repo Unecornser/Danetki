@@ -762,15 +762,18 @@ def use_stand_func(ret, res, user_id, action, text, repeate_txt):
 
 
 def what_i_know(res, user_id):
-    Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
+    try:
+        Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
 
-    res['response']['text'] = 'Ты уже знаешь такие детали:\n'
-    for hint in Hints:
-        if Hints[hint][2] is True:
-            res['response']['text'] += hint + '\n'
-    if res['response']['text'][-2] == ':':
-        res['response']['text'] = 'Пока что ты не узнал ничего особенного об этой Данетке.'
-    return
+        res['response']['text'] = 'Ты уже знаешь такие детали:\n'
+        for hint in Hints:
+            if Hints[hint][2] is True:
+                res['response']['text'] += hint + '\n'
+        if res['response']['text'][-2] == ':':
+            res['response']['text'] = 'Пока что ты не узнал ничего особенного об этой Данетке.'
+        return
+    except:
+        res['response']['text'] = 'Эта функция недоступна в мультиплеерном режиме.'
 
 
 def hint(res, user_id):
