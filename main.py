@@ -435,12 +435,12 @@ def handle_dialog(res, req):
 
                 if yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
                              'Ты знаешь правила игры?', hello_txt) is True:
-                    res['response']['text'] = 'Хорошо! Выбери Данетку:\n' + Dan_keys_txt
+                    res['response']['text'] = 'Хорошо! Выбери Данетку:\n' + Dan_keys_single_txt
 
                 elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
                                'Ты знаешь правила игры?', hello_txt) is False:
 
-                    res['response']['text'] = rules_txt + ' Теперь выбери Данетку:\n' + Dan_keys_txt
+                    res['response']['text'] = rules_txt + ' Теперь выбери Данетку:\n' + Dan_keys_single_txt
                 elif yes_or_no(req, res, user_id, sessionStorage[user_id]['action'],
                                'Ты знаешь правила игры?', hello_txt) == 'ya':
                     return
@@ -460,7 +460,7 @@ def handle_dialog(res, req):
                 if sessionStorage[user_id]['game'] == 'ya':
                     return
                 elif sessionStorage[user_id]['game'] is None:
-                    res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_txt
+                    res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_single_txt
                 else:  # Функция вернула название Данетки => продолжаем
 
                     text = Danetki[sessionStorage[user_id]['game']]['question']
@@ -510,7 +510,8 @@ def handle_dialog(res, req):
                         sessionStorage[user_id]['game'] = None
                         return
                     elif sessionStorage[user_id]['game'] is None:
-                        res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + Dan_keys_txt
+                        res['response']['text'] = 'Я не знаю такую Данетку, скажи ещё раз\n' + \
+                                                  (Dan_keys_single_txt if sessionStorage[user_id]['game_mode'] == 'single' else Dan_keys_multi_txt)
                     else:  # Функция вернула название Данетки => продолжаем
 
                         text = Danetki[sessionStorage[user_id]['game']]['question']
@@ -568,12 +569,12 @@ def game_mode(req, res, user_id):
     for single in single_player_list:
         if single in or_ut:
             res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
-                                      ' теперь выбери Данетку:\n' + Dan_keys_txt
+                                      ' теперь выбери Данетку:\n' + Dan_keys_single_txt
             return 'single_player'
     for multi in multi_player_list:
         if multi in or_ut:
             res['response']['text'] = multi_rules_txt + '\n\n' + random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
-                                      ' Теперь выберите Данетку:\n' + Dan_keys_txt
+                                      ' Теперь выберите Данетку:\n' + Dan_keys_multi_txt
             return 'multi_player'
 
     if check_another_oper(req, res, user_id, 'select_mode', game_mode_txt, game_mode_txt) is False:
@@ -595,6 +596,8 @@ def select(req, res, user_id):
                                      Danetki[key]['question']
             return key
 
+    select_txt = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + ' Теперь выбери Данетку' + \
+                 (Dan_keys_single_txt if sessionStorage[user_id]['game_mode'] == 'single' else Dan_keys_multi_txt)
     if check_another_oper(req, res, user_id, 'select_mode', select_txt, select_txt) is True:
         return 'ya'
     return None
@@ -632,20 +635,20 @@ def yes_or_no(req, res, user_id, action, text, repeate_txt):
 
 def txt_nat(text):
     text = text.replace(",", "")
-    text = text.replace("я знаю что", "")
-    text = text.replace("я придумал,", "")
-    text = text.replace("я думаю, что", "")
-    text = text.replace("мне кажется что", "")
-    text = text.replace("друг сказал что", "")
-    text = text.replace("мне подсказали что", "")
-    text = text.replace("я считаю что", "")
-    text = text.replace("я считаю", "")
-    text = text.replace("может быть", "")
-    text = text.replace(" возможно ", "")
-    text = text.replace(" типа ", "")
-    text = text.replace("вообще", "")
+    text = text.replace("я знаю что ", "")
+    text = text.replace("я придумал ", "")
+    text = text.replace("я думаю что ", "")
+    text = text.replace("мне кажется что ", "")
+    text = text.replace("друг сказал что ", "")
+    text = text.replace("мне подсказали что ", "")
+    text = text.replace("я считаю что ", "")
+    text = text.replace("я считаю ", "")
+    text = text.replace("может быть ", "")
+    text = text.replace("возможно ", "")
+    text = text.replace("типа ", "")
+    text = text.replace("вообще ", "")
     text = text.replace("ё", "е")
-    text = text.replace(" мне кажется ", "")
+    text = text.replace("мне кажется ", " ")
     # Избавляемся от лишнего в
     # тексте для дальнейшей обработки.
 
