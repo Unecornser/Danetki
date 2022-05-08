@@ -646,12 +646,12 @@ def yes_or_no(req, res, user_id, action, text, repeate_txt):
 
     # Функция вернёт True, если ответ положительный
     # и вернёт False, если ответ отрицательный
-    for y in Yes_list:
-        if y in or_ut:
-            return True
     for n in No_list:
         if n in or_ut:
             return False
+    for y in Yes_list:
+        if y in or_ut:
+            return True
     if check_another_oper(req, res, user_id, action, text, repeate_txt) is False:
         res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи "Да" или "Нет" или, ' \
                                   'если что-то не так, скажи "Помощь"'
