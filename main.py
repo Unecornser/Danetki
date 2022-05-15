@@ -37,7 +37,37 @@ def handle_dialog(res, req):
         res['response']['text'] = 'Привет, Я Дана и я обожаю разные загадки, давай играть в Данетки! Это ' \
                                   'увлекательная игра, где тебе нужно угадывать предыстории, которым последовала ' \
                                   'необычная ситуация. Ты знаешь правила игры?'
+        res['response']['buttons'] = [
+            {
+                'title': 'Да',
+                'hide': False
+            },
 
+            {
+                'title': 'Нет',
+                'hide': False
+            },
+
+            {
+                'title': 'Помощь',
+                'hide': True,
+            },
+
+            {
+                'title': 'Что ты умеешь',
+                'hide': True,
+            },
+
+            {
+                'title': 'Повтори',
+                'hide': True,
+            },
+
+            {
+                'title': 'Хватит',
+                'hide': True,
+            }
+        ]
         # создаем словарь в который в будущем положим имя пользователя
         sessionStorage[user_id] = {
             'action': None,
@@ -476,6 +506,17 @@ def handle_dialog(res, req):
                 else:
                     res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому"' \
                                               '\n\nТы знаешь правила игры?'
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Да',
+                            'hide': False
+                        },
+
+                        {
+                            'title': 'Нет',
+                            'hide': False
+                        }
+                    ]
                     return
                 sessionStorage[user_id]['action'] = 'select_mode'
 
@@ -502,6 +543,27 @@ def handle_dialog(res, req):
                 play(req, res, user_id)
 
         elif sessionStorage['OS'] == 'display':
+            res['response']['buttons'] = [
+                {
+                    'title': 'Помощь',
+                    'hide': True,
+                },
+
+                {
+                    'title': 'Что ты умеешь',
+                    'hide': True,
+                },
+
+                {
+                    'title': 'Повтори',
+                    'hide': True,
+                },
+
+                {
+                    'title': 'Хватит',
+                    'hide': True,
+                }
+            ]
             if sessionStorage[user_id]['action'] is None:
 
                 # Если поле sessionStorage[user_id]['action'] пустое,
@@ -511,10 +573,32 @@ def handle_dialog(res, req):
                 if yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?', hello_txt) is True:
                     res['response']['text'] = 'Хорошо! Выбери режим игры:\n\nИграть одному\nИграть с друзьями'
                     res['response']['tts'] = 'Хорошо! Выбери режим игры: Играть одному или Играть с друзьями'
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Играть одному',
+                            'hide': False
+                        },
+
+                        {
+                            'title': 'Играть с друзьями',
+                            'hide': False
+                        },
+                    ]
 
                 elif yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?', hello_txt) is False:
                     res['response']['text'] = rules_txt + '\n\n' + \
                                               'Выбери режим игры:\n\nИграть одному\nИграть с друзьями'
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Играть одному',
+                            'hide': False
+                        },
+
+                        {
+                            'title': 'Играть с друзьями',
+                            'hide': False
+                        },
+                    ]
 
                 elif yes_or_no(req, res, user_id, None, 'Ты знаешь правила игры?', hello_txt) == 'ya':
                     return
@@ -522,6 +606,17 @@ def handle_dialog(res, req):
                 else:
                     res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
                                               'не так, скажи "Помощь"\n\nТы знаешь правила игры?'
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Да',
+                            'hide': False
+                        },
+
+                        {
+                            'title': 'Нет',
+                            'hide': False
+                        }
+                    ]
                     return
                 sessionStorage[user_id]['action'] = 'select_mode'
 
@@ -554,6 +649,12 @@ def handle_dialog(res, req):
                             res['response']['card']['image_id'] = image
                             res['response']['card']['description'] = description
                             res['response']['tts'] = Danetki[sessionStorage[user_id]['game']]['sound'] + description
+                            res['response']['buttons'] = [
+                                {
+                                    'title': 'Мы закончили',
+                                    'hide': False
+                                },
+                            ]
                         else:
                             res['response']['text'] = text
                             res['response']['tts'] = Danetki[sessionStorage[user_id]['game']]['sound'] + text
@@ -561,7 +662,52 @@ def handle_dialog(res, req):
                         sessionStorage[user_id]['action'] = 'play'
 
             elif sessionStorage[user_id]['action'] == 'play':
+                res['response']['buttons'] = [
+                    {
+                        'title': 'Другую Данетку',
+                        'hide': True
+                    },
 
+                    {
+                        'title': 'Подсказка',
+                        'hide': True
+                    },
+
+                    {
+                        'title': 'Повтори Данетку',
+                        'hide': True
+                    },
+
+                    {
+                        'title': 'Что я уже знаю?',
+                        'hide': True
+                    },
+
+                    {
+                        'title': 'Сдаться',
+                        'hide': True
+                    },
+
+                    {
+                        'title': 'Помощь',
+                        'hide': True,
+                    },
+
+                    {
+                        'title': 'Что ты умеешь',
+                        'hide': True,
+                    },
+
+                    {
+                        'title': 'Повтори',
+                        'hide': True,
+                    },
+
+                    {
+                        'title': 'Хватит',
+                        'hide': True,
+                    }
+                ]
                 # Начинается игра. Алиса читает условие Данетки.
 
                 if sessionStorage[user_id]['game_mode'] == 'single_player':
@@ -571,30 +717,65 @@ def handle_dialog(res, req):
                         res['response']['text'] = 'Отлично! Вы молодцы. Хотите ещё Данетку?'
                         res['response']['tts'] = '<speaker audio="alice-sounds-game-win-3.opus">' + \
                                                  'Отлично! Вы молодцы. Хотите ещё Данетку?'
+                        res['response']['buttons'] = [
+                            {
+                                'title': 'Да',
+                                'hide': False
+                            },
+
+                            {
+                                'title': 'Нет',
+                                'hide': False
+                            }
+                        ]
                         sessionStorage[user_id]['action'] = 'end_Dan'
 
             elif sessionStorage[user_id]['action'] == 'end_Dan':
                 if yes_or_no(req, res, user_id, 'end_Dan', 'Хотите ещё Данетку?', '') is True:
                     res['response']['text'] = 'Хорошо, секунду. Вы помните правила?'
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Да',
+                            'hide': False
+                        },
+
+                        {
+                            'title': 'Нет',
+                            'hide': False
+                        }
+                    ]
                     sessionStorage[user_id]['action'] = None
                     sessionStorage[user_id]['game_mode'] = None
                     sessionStorage[user_id]['game'] = None
                 elif yes_or_no(req, res, user_id, 'end_Dan', 'Хотите ещё Данетку?', '') is False:
-                    res['response']['text'] = 'Приятно было поиграть, пока-пока'
+                    res['response']['text'] = 'Приятно было поиграть! Пока-пока.'
                     res['response']['end_session'] = True
                 elif yes_or_no(req, res, user_id, 'end_Dan', 'Хотите ещё Данетку?', '') == 'ya':
                     return
                 else:
                     res['response']['text'] = 'Прости, я не поняла твой ответ. Скажи по-другому или, если что-то ' \
                                               'не так, скажи "Помощь"\n\nХотите ещё Данетку?'
+                    res['response']['buttons'] = [
+                        {
+                            'title': 'Да',
+                            'hide': False
+                        },
+
+                        {
+                            'title': 'Нет',
+                            'hide': False
+                        }
+                    ]
         return
 
 
 def game_mode(req, res, user_id):
     # Функция узнаёт и передёт в sessionStorage[user_id]['game_mode']
     # режим игры (однопользовательский или многопользовательский).
-
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    try:
+        or_ut = req['request']['command'].lower().replace('ё', 'е')
+    except:
+        or_ut = ' '.join(req['request']['nly']['tokens']).lower().replace('ё', 'е')
     for single in single_player_list:
         if single in or_ut:
             res['response']['text'] = random.choice(['Отлично!', 'Хорошо!', 'Поняла,']) + \
@@ -617,12 +798,62 @@ def select(req, res, user_id):
     # Функция узнаёт и передаёт в sessionStorage[user_id]['game']
     # ту Данетку, которую выбрал пользователь.
 
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    try:
+        or_ut = req['request']['command'].lower().replace('ё', 'е')
+    except:
+        or_ut = ' '.join(req['request']['nlu']['tokens']).lower().replace('ё', 'е')
+
     for key in Danetki.keys():
         if or_ut in key.lower():
             res['response']['text'] = random.choice(['Отлично! ', 'Хороший выбор! ']) + Danetki[key]['question']
             res['response']['tts'] = Danetki[key]['sound'] + random.choice(['Отлично! ', 'Хороший выбор! ']) + \
                                      Danetki[key]['question']
+            res['response']['buttons'] = [
+                {
+                    'title': 'Другую Данетку',
+                    'hide': True
+                },
+
+                {
+                    'title': 'Подсказка',
+                    'hide': True
+                },
+
+                {
+                    'title': 'Повтори Данетку',
+                    'hide': True
+                },
+
+                {
+                    'title': 'Что я уже знаю?',
+                    'hide': True
+                },
+
+                {
+                    'title': 'Сдаться',
+                    'hide': True
+                },
+
+                {
+                    'title': 'Помощь',
+                    'hide': True,
+                },
+
+                {
+                    'title': 'Что ты умеешь',
+                    'hide': True,
+                },
+
+                {
+                    'title': 'Повтори',
+                    'hide': True,
+                },
+
+                {
+                    'title': 'Хватит',
+                    'hide': True,
+                }
+            ]
             return key
 
     select_txt = Dan_keys_single_txt if sessionStorage[user_id]['game_mode'] == 'single_player' else Dan_keys_multi_txt
@@ -643,7 +874,10 @@ def get_first_name(req):
 
 
 def yes_or_no(req, res, user_id, action, text, repeate_txt):
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    try:
+        or_ut = req['request']['command'].lower().replace('ё', 'е')
+    except:
+        or_ut = ' '.join(req['request']['nlu']['tokens']).lower().replace('ё', 'е')
 
     # Функция вернёт True, если ответ положительный
     # и вернёт False, если ответ отрицательный
@@ -703,7 +937,11 @@ def check_another_oper(req, res, user_id, action, text, repeate_txt):
     # Функция проверяет, вызывал ли пользователь
     # что-либо из standart_functions
 
-    or_ut = req['request']['command'].lower().replace('ё', 'е')
+    try:
+        or_ut = req['request']['command'].lower().replace('ё', 'е')
+    except:
+        or_ut = ' '.join(req['request']['nlu']['tokens']).lower().replace('ё', 'е')
+
     ret = 0
     for word in Help_list:  # Помощь
         if word in or_ut:
@@ -729,6 +967,10 @@ def check_another_oper(req, res, user_id, action, text, repeate_txt):
     for word in Continue_list:  # Продолжить играть
         if word in or_ut:
             ret = 8
+    if or_ut == 'хватит':
+        ret = 9
+    if or_ut == 'сдаться':
+        ret = 10
     return use_stand_func(ret, res, user_id, action, text, repeate_txt)
 
 
@@ -749,6 +991,17 @@ def use_stand_func(ret, res, user_id, action, text, repeate_txt):
         sessionStorage[user_id]['action'] = None
         sessionStorage[user_id]['game_mode'] = None
         sessionStorage[user_id]['game'] = None
+        res['response']['buttons'] = [
+            {
+                'title': 'Да',
+                'hide': False
+            },
+
+            {
+                'title': 'Нет',
+                'hide': False
+            },
+        ]
         # Другая Данека
     elif ret == 4:
         try:
@@ -768,6 +1021,15 @@ def use_stand_func(ret, res, user_id, action, text, repeate_txt):
     elif ret == 8:
         res['response']['text'] = text
         sessionStorage[user_id]['action'] = action
+    elif ret == 9:
+        res['response']['text'] = 'Приятно было поиграть! Пока-пока.'
+        res['response']['end_session'] = True
+    elif ret == 10:
+        res['response']['text'] = 'Жаль, что у тебя не получилось разгадать. Вот ответ:\n' + \
+                                  Danetki[sessionStorage[user_id]['game']]['answer'] + \
+                                  '\n\nЕсли ты хочешь ещё Данетку, скажи "Хочу другую Данетку" или ' \
+                                  '"Хватит", если хочешь выйти из навыка.'
+
     return True
 
 
@@ -831,7 +1093,11 @@ def Alice_anwer(req, res):
     user_id = req['session']['user_id']
     danetka = sessionStorage[user_id]['game']
     Hints = sessionStorage[user_id]['for_hints'][sessionStorage[user_id]['game']]
-    or_ut = ' '.join(sorted(txt_nat(req['request']['command']).lower().split()))
+    try:
+        or_ut = ' '.join(sorted(txt_nat(req['request']['command'].lower()).split()))
+    except:
+        or_ut = txt_nat((' '.join(sorted(req['request']['nlu']['tokens']))).lower())
+
     if ' не ' in or_ut:
         or_ut_ne = txt_nat(or_ut.replace(' не ', ' ').lower())
         or_ut_ne = or_ut_ne.replace('не ', '')
@@ -854,7 +1120,10 @@ def Alice_anwer(req, res):
 
 
 def wait_user_answer(req, res, user_id, action, text):
-    user_answer = req['request']['command'].lower().replace('ё', 'е')
+    try:
+        user_answer = req['request']['command'].lower().replace('ё', 'е')
+    except:
+        user_answer = ' '.join(req['request']['nlu']['tokens']).lower().replace('ё', 'е')
 
     for word in Multi_complete_list:
         if word in user_answer:
