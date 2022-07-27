@@ -654,6 +654,26 @@ def handle_dialog(res, req):
                                     'title': 'Мы закончили',
                                     'hide': False
                                 },
+
+                                {
+                                    'title': 'Помощь',
+                                    'hide': True
+                                },
+
+                                {
+                                    'title': 'Что ты умеешь',
+                                    'hide': True
+                                },
+
+                                {
+                                    'title': 'Хватит',
+                                    'hide': True
+                                },
+
+                                {
+                                    'title': 'Повтори',
+                                    'hide': True
+                                }
                             ]
                         else:
                             res['response']['text'] = text
@@ -674,7 +694,7 @@ def handle_dialog(res, req):
                     },
 
                     {
-                        'title': 'Повтори Данетку',
+                        'title': 'Повтори',
                         'hide': True
                     },
 
@@ -695,11 +715,6 @@ def handle_dialog(res, req):
 
                     {
                         'title': 'Что ты умеешь',
-                        'hide': True,
-                    },
-
-                    {
-                        'title': 'Повтори',
                         'hide': True,
                     },
 
@@ -816,11 +831,6 @@ def select(req, res, user_id):
 
                 {
                     'title': 'Подсказка',
-                    'hide': True
-                },
-
-                {
-                    'title': 'Повтори Данетку',
                     'hide': True
                 },
 
@@ -969,7 +979,7 @@ def check_another_oper(req, res, user_id, action, text, repeate_txt):
             ret = 8
     if or_ut == 'хватит':
         ret = 9
-    if or_ut == 'сдаться':
+    if or_ut == 'сдаться' or or_ut == 'сдаюсь':
         ret = 10
     return use_stand_func(ret, res, user_id, action, text, repeate_txt)
 
@@ -1001,6 +1011,26 @@ def use_stand_func(ret, res, user_id, action, text, repeate_txt):
                 'title': 'Нет',
                 'hide': False
             },
+
+            {
+                'title': 'Помощь',
+                'hide': True,
+            },
+
+            {
+                'title': 'Что ты умеешь',
+                'hide': True,
+            },
+
+            {
+                'title': 'Повтори',
+                'hide': True,
+            },
+
+            {
+                'title': 'Хватит',
+                'hide': True,
+            }
         ]
         # Другая Данека
     elif ret == 4:
@@ -1025,10 +1055,13 @@ def use_stand_func(ret, res, user_id, action, text, repeate_txt):
         res['response']['text'] = 'Приятно было поиграть! Пока-пока.'
         res['response']['end_session'] = True
     elif ret == 10:
-        res['response']['text'] = 'Жаль, что у тебя не получилось разгадать. Вот ответ:\n' + \
-                                  Danetki[sessionStorage[user_id]['game']]['answer'] + \
-                                  '\n\nЕсли ты хочешь ещё Данетку, скажи "Хочу другую Данетку" или ' \
-                                  '"Хватит", если хочешь выйти из навыка.'
+        try:
+            res['response']['text'] = 'Жаль, что у тебя не получилось разгадать. Вот ответ:\n' + \
+                                      Danetki[sessionStorage[user_id]['game']]['answer'] + \
+                                      '\n\nЕсли ты хочешь ещё Данетку, скажи "Хочу другую Данетку" или ' \
+                                      '"Хватит", если хочешь выйти из навыка.'
+        except:
+            res['response']['text'] = 'Данетка ещё не выбрана или эта функция недоступна в данном режиме'
 
     return True
 
@@ -1060,7 +1093,7 @@ def hint(res, user_id):
                                   'вопросы и у тебя всё получится'
         return
     except:
-        res['response']['text'] = 'Данетка ещё не выбрана'
+        res['response']['text'] = 'Данетка ещё не выбрана или эта функция недоступна в данном режиме'
         return
 
 
